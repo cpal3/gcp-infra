@@ -1,0 +1,66 @@
+# Terraform Bootstrap Workflow
+# 
+# This workflow manages the lifecycle of the bootstrap resources (Seed Project, GCS Bucket, WIF).
+# Even though these are likely "one-time" setups, keeping them in Terraform allows for:
+# 1. Drift detection (if someone manually changes permissions).
+# 2. Easy updates (e.g., adding a new Service Account or changing WIF settings).
+
+name: "Terraform Bootstrap"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'bootstrap/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'bootstrap/**'
+
+jobs:
+  terraform:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+    
+    # These permissions are required for Workload Identity Federation
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    defaults:
+      run:
+        working-directory: ./bootstrap
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Authenticate to Google Cloud using WIF
+      # Replace the 'workload_identity_provider' with your OUTPUT value from bootstrap
+      # Replace 'service_account' with your OUTPUT value
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          workload_identity_provider: 'projects/671995239099/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider' # UPDATE THIS
+          service_account: 'terraform-runner@ingr-seed-project.iam.gserviceaccount.com' # UPDATE THIS
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -input=false
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
