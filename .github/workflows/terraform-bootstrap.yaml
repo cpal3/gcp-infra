@@ -24,8 +24,6 @@ jobs:
     name: "Terraform"
     runs-on: ubuntu-latest
 
-    runs-on: ubuntu-latest
-
     
     # These permissions are required for Workload Identity Federation
     permissions:
