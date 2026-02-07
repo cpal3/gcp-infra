@@ -28,5 +28,4 @@ jobs:
 
       - name: Test access
         run: |
-          gcloud config set project ingr-test-project
-          gcloud projects describe ingr-test-project
+          gcloud projects describe ingr-seed-project
