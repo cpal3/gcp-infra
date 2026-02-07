@@ -71,7 +71,7 @@ resource "google_service_account" "terraform_runner" {
   depends_on   = [google_project_service.additional_apis]
 }
 
-# Grant the SA permissions on the seed project to manage state and services
+# Grant the SA permissions on the seed project to manage state, services, and IAM
 resource "google_project_iam_member" "sa_storage_admin" {
   project = google_project.seed_project.project_id
   role    = "roles/storage.admin"
@@ -93,6 +93,18 @@ resource "google_project_iam_member" "sa_project_iam_admin" {
 resource "google_project_iam_member" "sa_wif_admin" {
   project = google_project.seed_project.project_id
   role    = "roles/iam.workloadIdentityPoolAdmin"
+  member  = "serviceAccount:${google_service_account.terraform_runner.email}"
+}
+
+resource "google_project_iam_member" "sa_iam_service_account_admin" {
+  project = google_project.seed_project.project_id
+  role    = "roles/iam.serviceAccountAdmin"
+  member  = "serviceAccount:${google_service_account.terraform_runner.email}"
+}
+
+resource "google_project_iam_member" "sa_project_browser" {
+  project = google_project.seed_project.project_id
+  role    = "roles/browser"
   member  = "serviceAccount:${google_service_account.terraform_runner.email}"
 }
 

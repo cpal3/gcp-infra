@@ -28,4 +28,4 @@ jobs:
 
       - name: Test access
         run: |
-          gcloud projects describe ingr-seed-project
+          gcloud projects list
