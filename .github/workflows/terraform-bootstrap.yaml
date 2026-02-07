@@ -25,6 +25,14 @@ jobs:
     name: "Terraform"
     runs-on: ubuntu-latest
 
+    env:
+      TF_VAR_org_id: ${{ secrets.TF_VAR_ORG_ID }}
+      TF_VAR_billing_account: ${{ secrets.TF_VAR_BILLING_ACCOUNT }}
+      TF_VAR_project_name: ${{ secrets.TF_VAR_PROJECT_NAME }}
+      TF_VAR_region: ${{ secrets.TF_VAR_REGION }}
+      TF_VAR_github_repo: ${{ secrets.TF_VAR_GITHUB_REPO }}
+
+
     
     # These permissions are required for Workload Identity Federation
     permissions:
@@ -38,16 +46,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
-
-      - name: Create tfvars file
-        run: |
-          cat <<EOF > terraform.tfvars
-          org_id          = "${{ secrets.TF_VAR_ORG_ID }}"
-          billing_account = "${{ secrets.TF_VAR_BILLING_ACCOUNT }}"
-          project_name    = "${{ secrets.TF_VAR_PROJECT_NAME }}"
-          region          = "${{ secrets.TF_VAR_REGION }}"
-          github_repo     = "${{ secrets.TF_VAR_GITHUB_REPO }}"
-          EOF
 
       # Authenticate to Google Cloud using WIF
       # Replace the 'workload_identity_provider' with your OUTPUT value from bootstrap
