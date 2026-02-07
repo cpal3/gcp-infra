@@ -13,6 +13,7 @@ on:
       - main
     paths:
       - 'bootstrap/**'
+      - '.github/workflows/terraform-bootstrap.yaml'
   pull_request:
     branches:
       - main
