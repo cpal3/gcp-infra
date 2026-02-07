@@ -1,0 +1,68 @@
+# Terraform Foundation Workflow
+#
+# This workflow manages the infrastructure foundation (Folders, Projects, Org Policies, Networking).
+# It uses the authentication and state bucket established in the bootstrap process.
+
+name: "Terraform Foundation"
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'foundation/**'
+      - '.github/workflows/terraform-foundation.yaml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'foundation/**'
+
+jobs:
+  terraform:
+    name: "Terraform"
+    runs-on: ubuntu-latest
+
+    env:
+      TF_VAR_org_id: ${{ secrets.TF_VAR_ORG_ID }}
+      TF_VAR_billing_account: ${{ secrets.TF_VAR_BILLING_ACCOUNT }}
+      TF_VAR_project_name: ${{ secrets.TF_VAR_PROJECT_NAME }}
+      TF_VAR_region: ${{ secrets.TF_VAR_REGION }}
+      TF_VAR_github_repo: ${{ secrets.TF_VAR_GITHUB_REPO }}
+
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    defaults:
+      run:
+        working-directory: ./foundation
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/671995239099/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+          service_account: 'terraform-runner@ingr-seed-project.iam.gserviceaccount.com'
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        if: github.event_name == 'pull_request'
+        run: terraform plan -input=false
+
+      - name: Terraform Apply
+        if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false

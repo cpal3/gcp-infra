@@ -1,3 +1,21 @@
+terraform {
+  required_version = ">= 1.0"
+  required_providers {
+    google = {
+      source  = "hashicorp/google"
+      version = ">= 4.0"
+    }
+  }
+  backend "gcs" {
+    bucket = "ingr-seed-project-tfstate"
+    prefix = "terraform/foundation"
+  }
+}
+
+provider "google" {
+  region = var.region
+}
+
 module "folders" {
   source = "../modules/folder"
 
