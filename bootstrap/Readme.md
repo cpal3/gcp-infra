@@ -69,17 +69,32 @@ Now that the bucket exists, we will move the local `terraform.tfstate` file to t
 
 **Success!** Your bootstrap state is now securely stored in GCS. You can delete the local `terraform.tfstate` and `terraform.tfstate.backup` files.
 
+## Security & IAM
+
+To avoid "Permission Denied" errors during the initial bootstrap, you must manually grant several roles to the **Terraform Runner Service Account** at the **Organization Level**.
+
+### Mandatory Manual Roles
+Grant these roles to `terraform-runner@...` using the GCP Console (ensure you select the **Organization** in the top dropdown):
+
+1.  **Organization IAM Administrator** (`roles/resourcemanager.organizationIamAdmin`): 
+    *Why?* Required so the Bootstrap pipeline can manage the roles listed in `iam_roles.yaml`.
+2.  **Organization Viewer** (`roles/resourcemanager.organizationViewer`): 
+    *Why?* Required for Terraform to see organizational resources.
+3.  **Billing Account User** (`roles/billing.user`): 
+    *Why?* Required to attach billing accounts to new projects.
+4.  **Folder Admin** (`roles/resourcemanager.folderAdmin`): 
+    *Why?* Required to create the initial folder hierarchy.
+
+Once these are granted **one time**, the Bootstrap pipeline will be "unlocked" and can manage its own future role updates via the `iam_roles.yaml` file.
+
 ---
 
 ## Next Steps
 
-1.  **Grant Permissions**:
-    The created Service Account (`terraform-runner@...`) needs permissions to create folders and projects in your Organization. Grant it `roles/resourcemanager.folderAdmin` and `roles/resourcemanager.projectCreator` at the Organization level.
-
-2.  **Configure GitHub Actions**:
+1.  **Configure GitHub Actions**:
     Use the `workload_identity_provider` output in your GitHub Actions YAML:
     ```yaml
-    - uses: "google-github-actions/auth@v1"
+    - uses: "google-github-actions/auth@v2"
       with:
         workload_identity_provider: "projects/123456789/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider"
         service_account: "terraform-runner@seed-project-123.iam.gserviceaccount.com"
