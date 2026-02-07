@@ -71,41 +71,34 @@ resource "google_service_account" "terraform_runner" {
   depends_on   = [google_project_service.additional_apis]
 }
 
-# Grant the SA permissions on the seed project to manage state, services, and IAM
-resource "google_project_iam_member" "sa_storage_admin" {
-  project = google_project.seed_project.project_id
-  role    = "roles/storage.admin"
-  member  = "serviceAccount:${google_service_account.terraform_runner.email}"
+# --- TERRAFORM RUNNER IAM (YAML DRIVEN) ---
+
+locals {
+  iam_config = yamldecode(file("${path.module}/iam_roles.yaml"))
 }
 
-resource "google_project_iam_member" "sa_service_usage_admin" {
-  project = google_project.seed_project.project_id
-  role    = "roles/serviceusage.serviceUsageAdmin"
-  member  = "serviceAccount:${google_service_account.terraform_runner.email}"
+module "runner_project_iam" {
+  source    = "../modules/iam"
+  mode      = "project"
+  target_id = google_project.seed_project.project_id
+  bindings = [
+    for role in local.iam_config.project_roles : {
+      role   = role
+      member = "serviceAccount:${google_service_account.terraform_runner.email}"
+    }
+  ]
 }
 
-resource "google_project_iam_member" "sa_project_iam_admin" {
-  project = google_project.seed_project.project_id
-  role    = "roles/resourcemanager.projectIamAdmin"
-  member  = "serviceAccount:${google_service_account.terraform_runner.email}"
-}
-
-resource "google_project_iam_member" "sa_wif_admin" {
-  project = google_project.seed_project.project_id
-  role    = "roles/iam.workloadIdentityPoolAdmin"
-  member  = "serviceAccount:${google_service_account.terraform_runner.email}"
-}
-
-resource "google_project_iam_member" "sa_iam_service_account_admin" {
-  project = google_project.seed_project.project_id
-  role    = "roles/iam.serviceAccountAdmin"
-  member  = "serviceAccount:${google_service_account.terraform_runner.email}"
-}
-
-resource "google_project_iam_member" "sa_project_browser" {
-  project = google_project.seed_project.project_id
-  role    = "roles/browser"
-  member  = "serviceAccount:${google_service_account.terraform_runner.email}"
+module "runner_org_iam" {
+  source    = "../modules/iam"
+  mode      = "organization"
+  target_id = var.org_id
+  bindings = [
+    for role in local.iam_config.org_roles : {
+      role   = role
+      member = "serviceAccount:${google_service_account.terraform_runner.email}"
+    }
+  ]
 }
 
 # Ideally, this SA needs Org Admin or Folder Admin to create subsequent projects.

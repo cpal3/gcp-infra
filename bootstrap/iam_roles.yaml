@@ -1,0 +1,16 @@
+# IAM Roles for the Terraform Runner Service Account
+# Distinguish between roles assigned at the Organization root and Project level.
+
+org_roles:
+  - roles/resourcemanager.folderAdmin
+  - roles/resourcemanager.projectCreator
+  - roles/billing.user
+  - roles/resourcemanager.organizationViewer
+
+project_roles:
+  - roles/storage.admin
+  - roles/serviceusage.serviceUsageAdmin
+  - roles/resourcemanager.projectIamAdmin
+  - roles/iam.workloadIdentityPoolAdmin
+  - roles/iam.serviceAccountAdmin
+  - roles/browser

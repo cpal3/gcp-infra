@@ -4,12 +4,12 @@ variable "target_id" {
 }
 
 variable "mode" {
-  description = "One of 'project' or 'folder'."
+  description = "One of 'project', 'folder', or 'organization'."
   type        = string
   default     = "project"
   validation {
-    condition     = contains(["project", "folder"], var.mode)
-    error_message = "Mode must be 'project' or 'folder'."
+    condition     = contains(["project", "folder", "organization"], var.mode)
+    error_message = "Mode must be 'project', 'folder', or 'organization'."
   }
 }
 
