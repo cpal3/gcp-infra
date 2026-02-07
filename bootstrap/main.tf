@@ -90,5 +90,11 @@ resource "google_project_iam_member" "sa_project_iam_admin" {
   member  = "serviceAccount:${google_service_account.terraform_runner.email}"
 }
 
+resource "google_project_iam_member" "sa_wif_admin" {
+  project = google_project.seed_project.project_id
+  role    = "roles/iam.workloadIdentityPoolAdmin"
+  member  = "serviceAccount:${google_service_account.terraform_runner.email}"
+}
+
 # Ideally, this SA needs Org Admin or Folder Admin to create subsequent projects.
 # We output its email so you can grant it those permissions manually or via a separate step.

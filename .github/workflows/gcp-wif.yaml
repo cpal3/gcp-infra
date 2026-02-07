@@ -1,0 +1,32 @@
+name: GCP WIF Test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write   # REQUIRED
+
+jobs:
+  test-gcp:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          #workload_identity_provider: "projects/442447914347/locations/global/workloadIdentityPools/github-pool/providers/github-provider"
+          #service_account: "github-deployer@ingr-test-project.iam.gserviceaccount.com"
+          workload_identity_provider: 'projects/671995239099/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider' # UPDATE THIS
+          service_account: 'terraform-runner@ingr-seed-project.iam.gserviceaccount.com' # UPDATE THIS
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Test access
+        run: |
+          gcloud config set project ingr-test-project
+          gcloud projects describe ingr-test-project
