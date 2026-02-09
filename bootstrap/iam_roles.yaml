@@ -2,7 +2,6 @@
 # These roles allow managing the Seed Project and granting roles in sub-layers.
 
 org_roles:
-  - roles/resourcemanager.organizationIamAdmin  # Power to grant own roles in Foundation
   - roles/resourcemanager.organizationViewer
   - roles/billing.user
 
