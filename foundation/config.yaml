@@ -1,0 +1,25 @@
+# Foundation Configuration
+# Drive APIs and Organization Policies from this file.
+
+project_apis:
+  common_hub_net:
+    - compute.googleapis.com
+    - servicenetworking.googleapis.com
+    - dns.googleapis.com
+  common_logging:
+    - logging.googleapis.com
+    - bigquery.googleapis.com
+    - storage.googleapis.com
+  prod_host:
+    - compute.googleapis.com
+    - container.googleapis.com
+  non_prod_host:
+    - compute.googleapis.com
+    - container.googleapis.com
+
+org_policies:
+  - constraint: constraints/iam.disableServiceAccountKeyCreation
+    enforce: true
+  - constraint: constraints/compute.vmExternalIpAccess
+    enforce: true
+    is_list: true # Boolean vs List policy handling

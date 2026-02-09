@@ -21,12 +21,22 @@ locals {
     cost_center = var.cost_center
     owner       = var.owner
   }
+  config = yamldecode(file("${path.module}/config.yaml"))
+
+  # Helper to identify projects for liens
+  project_ids = {
+    common-hub-net = module.common_hub_net.project_id
+    common-logging = module.common_logging.project_id
+    prod-host      = module.prod_host.project_id
+    non-prod-host  = module.non_prod_host.project_id
+  }
 }
 
 module "folders" {
   source = "../modules/folder"
 
-  parent_id = "organizations/${var.org_id}"
+  parent_id           = "organizations/${var.org_id}"
+  deletion_protection = var.deletion_protection
   names = [
     "prod",
     "non-prod",
@@ -45,11 +55,7 @@ module "common_hub_net" {
   billing_account   = var.billing_account
   environment       = "common"
   labels            = local.common_labels
-  apis = [
-    "compute.googleapis.com",
-    "servicenetworking.googleapis.com",
-    "dns.googleapis.com"
-  ]
+  apis              = local.config.project_apis.common_hub_net
 }
 
 # --- CENTRAL LOGGING ---
@@ -62,11 +68,7 @@ module "common_logging" {
   billing_account   = var.billing_account
   environment       = "common"
   labels            = local.common_labels
-  apis = [
-    "logging.googleapis.com",
-    "bigquery.googleapis.com",
-    "storage.googleapis.com"
-  ]
+  apis              = local.config.project_apis.common_logging
 }
 
 # --- PROD SHARED VPC HOST ---
@@ -79,10 +81,7 @@ module "prod_host" {
   billing_account   = var.billing_account
   environment       = "prod"
   labels            = local.common_labels
-  apis = [
-    "compute.googleapis.com",
-    "container.googleapis.com" # Often needed in prod-host for GKE
-  ]
+  apis              = local.config.project_apis.prod_host
 }
 
 # --- NON-PROD SHARED VPC HOST ---
@@ -95,30 +94,39 @@ module "non_prod_host" {
   billing_account   = var.billing_account
   environment       = "non-prod"
   labels            = local.common_labels
-  apis = [
-    "compute.googleapis.com",
-    "container.googleapis.com"
-  ]
+  apis              = local.config.project_apis.non_prod_host
+}
+
+# --- DELETION PROTECTION (LIENS) ---
+resource "google_resource_manager_lien" "project_liens" {
+  for_each = var.deletion_protection ? local.project_ids : {}
+
+  parent       = "projects/${each.value}"
+  restrictions = ["resourcemanager.projects.delete"]
+  origin       = "terraform-foundation-protection"
+  reason       = "Enterprise Landing Zone Foundation Project. Essential resource."
 }
 
 # --- ORGANIZATION POLICIES ---
+resource "google_organization_policy" "org_policies" {
+  for_each = { for p in local.config.org_policies : p.constraint => p }
 
-resource "google_organization_policy" "disable_sa_key_creation" {
   org_id     = var.org_id
-  constraint = "constraints/iam.disableServiceAccountKeyCreation"
+  constraint = each.value.constraint
 
-  boolean_policy {
-    enforced = true
+  dynamic "boolean_policy" {
+    for_each = lookup(each.value, "is_list", false) == false ? [1] : []
+    content {
+      enforced = each.value.enforce
+    }
   }
-}
 
-resource "google_organization_policy" "disable_external_ip" {
-  org_id     = var.org_id
-  constraint = "constraints/compute.vmExternalIpAccess"
-
-  list_policy {
-    deny {
-      all = true
+  dynamic "list_policy" {
+    for_each = lookup(each.value, "is_list", false) == true ? [1] : []
+    content {
+      deny {
+        all = each.value.enforce
+      }
     }
   }
 }

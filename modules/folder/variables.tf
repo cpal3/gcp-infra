@@ -7,3 +7,9 @@ variable "parent_id" {
   description = "The resource name of the parent Folder or Organization. Format: folders/{folder_id} or organizations/{org_id}"
   type        = string
 }
+
+variable "deletion_protection" {
+  description = "Whether to protect the folder from deletion."
+  type        = bool
+  default     = true
+}

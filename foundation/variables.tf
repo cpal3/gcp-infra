@@ -27,3 +27,9 @@ variable "owner" {
   description = "Owner for project labels."
   type        = string
 }
+
+variable "deletion_protection" {
+  description = "Whether to protect resources from deletion."
+  type        = bool
+  default     = true
+}
