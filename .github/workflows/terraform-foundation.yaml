@@ -1,0 +1,40 @@
+# Terraform Foundation Workflow
+# Manages the infrastructure foundation (Folders, Projects, Org Policies).
+
+name: "Terraform Foundation"
+
+concurrency:
+  group: terraform-deployment
+  cancel-in-progress: false
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'foundation/**'
+      - 'modules/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'foundation/**'
+      - 'modules/**'
+
+jobs:
+  foundation:
+    name: "Foundation"
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    uses: ./.github/workflows/terraform-module.yaml
+    with:
+      directory: 'foundation'
+      environment: 'foundation'
+      # removed needs: bootstrap dependency for true decoupling
+    secrets:
+      ORG_ID: ${{ secrets.TF_VAR_ORG_ID }}
+      BILLING_ACCOUNT: ${{ secrets.TF_VAR_BILLING_ACCOUNT }}
+      PROJECT_NAME: ${{ secrets.TF_VAR_PROJECT_NAME }}
+      REGION: ${{ secrets.TF_VAR_REGION }}
+      GITHUB_REPO: ${{ secrets.TF_VAR_GITHUB_REPO }}
