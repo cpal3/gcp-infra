@@ -1,10 +1,9 @@
-resource "random_id" "suffix" {
-  byte_length = 6
-}
+# Resource random_id removed to ensure Project IDs are stable and do not change on every run.
+# Uniqueness is managed by the var.name and var.project_id_prefix.
 
 resource "google_project" "project" {
   name            = var.name
-  project_id      = "${var.project_id_prefix}-${var.name}-${random_id.suffix.hex}"
+  project_id      = "${var.project_id_prefix}-${var.name}"
   folder_id       = var.folder_id
   billing_account = var.billing_account
   labels          = merge(var.labels, { environment = var.environment })

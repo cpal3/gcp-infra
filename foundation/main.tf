@@ -47,6 +47,14 @@ module "runner_org_iam" {
   ]
 }
 
+# --- IAM PROPAGATION WAIT ---
+# Role assignments are eventually consistent. We wait 60 seconds to ensure 
+# the Project Creator role is active across all regional endpoints.
+resource "time_sleep" "iam_propagation" {
+  create_duration = "60s"
+  depends_on      = [module.runner_org_iam]
+}
+
 module "folders" {
   source = "../modules/folder"
 
@@ -58,7 +66,7 @@ module "folders" {
     "common",
     "bootstrap"
   ]
-  depends_on = [module.runner_org_iam]
+  depends_on = [time_sleep.iam_propagation]
 }
 
 # --- CENTRAL NETWORKING HUB ---
