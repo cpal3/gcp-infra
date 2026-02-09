@@ -5,6 +5,10 @@
 
 name: "Terraform Foundation"
 
+concurrency:
+  group: terraform-deployment
+  cancel-in-progress: false
+
 on:
   push:
     branches:
