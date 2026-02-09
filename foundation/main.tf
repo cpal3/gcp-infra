@@ -58,6 +58,7 @@ module "folders" {
     "common",
     "bootstrap"
   ]
+  depends_on = [module.runner_org_iam]
 }
 
 # --- CENTRAL NETWORKING HUB ---
@@ -72,6 +73,7 @@ module "common_hub_net" {
   labels            = local.common_labels
   apis              = local.config.project_apis.hub_net
   deletion_protection = var.deletion_protection
+  depends_on        = [module.runner_org_iam]
 }
 
 # --- CENTRAL LOGGING ---
@@ -86,6 +88,7 @@ module "common_logging" {
   labels            = local.common_labels
   apis              = local.config.project_apis.logging
   deletion_protection = var.deletion_protection
+  depends_on        = [module.runner_org_iam]
 }
 
 # --- PROD SHARED VPC HOST ---
@@ -100,6 +103,7 @@ module "prod_host" {
   labels            = local.common_labels
   apis              = local.config.project_apis.prod_host
   deletion_protection = var.deletion_protection
+  depends_on        = [module.runner_org_iam]
 }
 
 # --- NON-PROD SHARED VPC HOST ---
@@ -114,6 +118,7 @@ module "non_prod_host" {
   labels            = local.common_labels
   apis              = local.config.project_apis.nonprod_host
   deletion_protection = var.deletion_protection
+  depends_on        = [module.runner_org_iam]
 }
 
 # --- DELETION PROTECTION (LIENS) ---
