@@ -49,26 +49,26 @@ module "folders" {
 module "common_hub_net" {
   source = "../modules/project"
 
-  name              = "common-hub-net"
+  name              = "hub-net"
   project_id_prefix = var.project_id_prefix
   folder_id         = module.folders.ids["common"]
   billing_account   = var.billing_account
   environment       = "common"
   labels            = local.common_labels
-  apis              = local.config.project_apis.common_hub_net
+  apis              = local.config.project_apis.hub_net
 }
 
 # --- CENTRAL LOGGING ---
 module "common_logging" {
   source = "../modules/project"
 
-  name              = "common-logging"
+  name              = "logging"
   project_id_prefix = var.project_id_prefix
   folder_id         = module.folders.ids["common"]
   billing_account   = var.billing_account
   environment       = "common"
   labels            = local.common_labels
-  apis              = local.config.project_apis.common_logging
+  apis              = local.config.project_apis.logging
 }
 
 # --- PROD SHARED VPC HOST ---
@@ -88,13 +88,13 @@ module "prod_host" {
 module "non_prod_host" {
   source = "../modules/project"
 
-  name              = "non-prod-host"
+  name              = "nonprod-host"
   project_id_prefix = var.project_id_prefix
   folder_id         = module.folders.ids["non-prod"]
   billing_account   = var.billing_account
   environment       = "non-prod"
   labels            = local.common_labels
-  apis              = local.config.project_apis.non_prod_host
+  apis              = local.config.project_apis.nonprod_host
 }
 
 # --- DELETION PROTECTION (LIENS) ---

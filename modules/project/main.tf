@@ -4,7 +4,7 @@ resource "random_id" "suffix" {
 
 resource "google_project" "project" {
   name            = var.name
-  project_id      = "${var.project_id_prefix}-${var.environment}-${var.name}-${random_id.suffix.hex}"
+  project_id      = "${var.project_id_prefix}-${var.name}-${random_id.suffix.hex}"
   folder_id       = var.folder_id
   billing_account = var.billing_account
   labels          = merge(var.labels, { environment = var.environment })

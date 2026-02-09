@@ -2,18 +2,18 @@
 # Drive APIs and Organization Policies from this file.
 
 project_apis:
-  common_hub_net:
+  hub_net:
     - compute.googleapis.com
     - servicenetworking.googleapis.com
     - dns.googleapis.com
-  common_logging:
+  logging:
     - logging.googleapis.com
     - bigquery.googleapis.com
     - storage.googleapis.com
   prod_host:
     - compute.googleapis.com
     - container.googleapis.com
-  non_prod_host:
+  nonprod_host:
     - compute.googleapis.com
     - container.googleapis.com
 

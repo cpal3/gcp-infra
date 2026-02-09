@@ -6,6 +6,8 @@ org_roles:
   - roles/resourcemanager.projectCreator
   - roles/billing.user
   - roles/resourcemanager.organizationViewer
+  - roles/orgpolicy.policyAdmin
+  - roles/logging.configWriter
 
 project_roles:
   - roles/storage.admin
