@@ -14,12 +14,15 @@ on:
     paths:
       - 'bootstrap/**'
       - 'modules/**'
+      - '.github/workflows/**'
   pull_request:
     branches:
       - main
     paths:
       - 'bootstrap/**'
       - 'modules/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
 
 jobs:
   bootstrap:
