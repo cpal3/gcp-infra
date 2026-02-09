@@ -1,5 +1,5 @@
 variable "names" {
-  description = "List of folder names. First name is the parent, subsequent names are children of that parent (flat hierarchy under the first)."
+  description = "List of folder names to create as siblings under the parent_id."
   type        = list(string)
 }
 
