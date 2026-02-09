@@ -1,0 +1,86 @@
+# Reusable Terraform Workflow
+# This file contains the shared logic for running Terraform in a specific directory.
+# It is called by the main orchestrator.
+
+name: "Terraform Module"
+
+on:
+  workflow_call:
+    inputs:
+      directory:
+        description: 'The directory to run Terraform in'
+        required: true
+        type: string
+      environment:
+        description: 'The environment name'
+        required: true
+        type: string
+    secrets:
+      ORG_ID:
+        required: true
+      BILLING_ACCOUNT:
+        required: true
+      PROJECT_NAME:
+        required: true
+      REGION:
+        required: true
+      GITHUB_REPO:
+        required: true
+
+jobs:
+  terraform:
+    name: "Run - ${{ inputs.directory }}"
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    env:
+      TF_VAR_org_id: ${{ secrets.ORG_ID }}
+      TF_VAR_billing_account: ${{ secrets.BILLING_ACCOUNT }}
+      TF_VAR_project_name: ${{ secrets.PROJECT_NAME }}
+      TF_VAR_region: ${{ secrets.REGION }}
+      TF_VAR_github_repo: ${{ secrets.GITHUB_REPO }}
+
+    defaults:
+      run:
+        working-directory: ${{ inputs.directory }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check for changes
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            changed:
+              - '${{ inputs.directory }}/**'
+              - 'modules/**'
+
+      - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.changed == 'true'
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/671995239099/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+          service_account: 'terraform-runner@ingr-seed-project.iam.gserviceaccount.com'
+
+      - name: Setup Terraform
+        if: steps.changes.outputs.changed == 'true'
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: 1.5.0
+
+      - name: Terraform Init
+        if: steps.changes.outputs.changed == 'true'
+        run: terraform init
+
+      - name: Terraform Plan
+        if: steps.changes.outputs.changed == 'true'
+        run: terraform plan -input=false
+
+      - name: Terraform Apply
+        if: steps.changes.outputs.changed == 'true' && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        run: terraform apply -auto-approve -input=false
