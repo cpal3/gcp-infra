@@ -1,0 +1,8 @@
+# Foundation Layer IAM Roles
+# Roles managed by the Foundation layer for its own operations.
+
+org_roles:
+  - roles/resourcemanager.folderAdmin
+  - roles/resourcemanager.projectCreator
+  - roles/orgpolicy.policyAdmin
+  - roles/logging.configWriter

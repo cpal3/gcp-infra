@@ -9,8 +9,8 @@ resource "google_project" "project" {
   billing_account = var.billing_account
   labels          = merge(var.labels, { environment = var.environment })
 
-  # Temporarily forced to DELETE to unblock replacement of old "PREVENT" projects
-  deletion_policy = "DELETE"
+  # Allow destruction if the variable is false
+  deletion_policy = var.deletion_protection ? "PREVENT" : "DELETE"
 }
 
 resource "google_project_service" "apis" {

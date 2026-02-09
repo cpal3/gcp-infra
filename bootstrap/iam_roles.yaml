@@ -1,13 +1,10 @@
-# IAM Roles for the Terraform Runner Service Account
-# Distinguish between roles assigned at the Organization root and Project level.
+# Core Bootstrap IAM Roles
+# These roles allow managing the Seed Project and granting roles in sub-layers.
 
 org_roles:
-  - roles/resourcemanager.folderAdmin
-  - roles/resourcemanager.projectCreator
-  - roles/billing.user
+  - roles/resourcemanager.organizationIamAdmin  # Power to grant own roles in Foundation
   - roles/resourcemanager.organizationViewer
-  - roles/orgpolicy.policyAdmin
-  - roles/logging.configWriter
+  - roles/billing.user
 
 project_roles:
   - roles/storage.admin

@@ -50,7 +50,8 @@ jobs:
     with:
       directory: 'foundation'
       environment: 'foundation'
-      pre_run_sleep: 60
+      # Only sleep if bootstrap actually applied changes
+      pre_run_sleep: ${{ needs.bootstrap.outputs.applied == 'true' && 60 || 0 }}
     secrets:
       ORG_ID: ${{ secrets.TF_VAR_ORG_ID }}
       BILLING_ACCOUNT: ${{ secrets.TF_VAR_BILLING_ACCOUNT }}

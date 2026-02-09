@@ -31,11 +31,17 @@ on:
         required: true
       GITHUB_REPO:
         required: true
+    outputs:
+      applied:
+        description: 'Whether terraform apply was executed'
+        value: ${{ jobs.terraform.outputs.applied }}
 
 jobs:
   terraform:
     name: "Run - ${{ inputs.directory }}"
     runs-on: ubuntu-latest
+    outputs:
+      applied: ${{ steps.apply.outputs.applied || 'false' }}
     
     permissions:
       contents: 'read'
@@ -91,5 +97,8 @@ jobs:
         run: terraform plan -input=false
 
       - name: Terraform Apply
+        id: apply
         if: steps.changes.outputs.changed == 'true' && github.ref == 'refs/heads/main' && github.event_name == 'push'
-        run: terraform apply -auto-approve -input=false
+        run: |
+          terraform apply -auto-approve -input=false
+          echo "applied=true" >> $GITHUB_OUTPUT

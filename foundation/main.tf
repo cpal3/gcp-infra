@@ -30,6 +30,21 @@ locals {
     prod-host      = module.prod_host.project_id
     non-prod-host  = module.non_prod_host.project_id
   }
+
+  iam_config = yamldecode(file("${path.module}/iam_roles.yaml"))
+}
+
+# --- RUNNER IAM (SELF-MANAGED) ---
+module "runner_org_iam" {
+  source    = "../modules/iam"
+  mode      = "organization"
+  target_id = var.org_id
+  bindings = [
+    for role in local.iam_config.org_roles : {
+      role   = role
+      member = "serviceAccount:terraform-runner@${var.project_id_prefix}-seed-project.iam.gserviceaccount.com"
+    }
+  ]
 }
 
 module "folders" {
