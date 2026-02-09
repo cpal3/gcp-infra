@@ -56,6 +56,7 @@ module "common_hub_net" {
   environment       = "common"
   labels            = local.common_labels
   apis              = local.config.project_apis.hub_net
+  deletion_protection = var.deletion_protection
 }
 
 # --- CENTRAL LOGGING ---
@@ -69,6 +70,7 @@ module "common_logging" {
   environment       = "common"
   labels            = local.common_labels
   apis              = local.config.project_apis.logging
+  deletion_protection = var.deletion_protection
 }
 
 # --- PROD SHARED VPC HOST ---
@@ -82,6 +84,7 @@ module "prod_host" {
   environment       = "prod"
   labels            = local.common_labels
   apis              = local.config.project_apis.prod_host
+  deletion_protection = var.deletion_protection
 }
 
 # --- NON-PROD SHARED VPC HOST ---
@@ -95,6 +98,7 @@ module "non_prod_host" {
   environment       = "non-prod"
   labels            = local.common_labels
   apis              = local.config.project_apis.nonprod_host
+  deletion_protection = var.deletion_protection
 }
 
 # --- DELETION PROTECTION (LIENS) ---

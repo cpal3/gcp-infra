@@ -15,6 +15,11 @@ on:
         description: 'The environment name'
         required: true
         type: string
+      pre_run_sleep:
+        description: 'Duration to sleep before running (to wait for IAM propagation)'
+        required: false
+        type: number
+        default: 0
     secrets:
       ORG_ID:
         required: true
@@ -50,6 +55,10 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Wait for IAM Propagation
+        if: inputs.pre_run_sleep > 0
+        run: sleep ${{ inputs.pre_run_sleep }}
 
       - name: Check for changes
         id: changes

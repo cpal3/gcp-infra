@@ -44,3 +44,9 @@ variable "apis" {
     "storage.googleapis.com"
   ]
 }
+
+variable "deletion_protection" {
+  description = "Whether to protect the project from deletion."
+  type        = bool
+  default     = true
+}

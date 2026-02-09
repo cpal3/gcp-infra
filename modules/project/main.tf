@@ -8,6 +8,9 @@ resource "google_project" "project" {
   folder_id       = var.folder_id
   billing_account = var.billing_account
   labels          = merge(var.labels, { environment = var.environment })
+
+  # Allow destruction if the variable is false
+  deletion_policy = var.deletion_protection ? "PREVENT" : "DELETE"
 }
 
 resource "google_project_service" "apis" {

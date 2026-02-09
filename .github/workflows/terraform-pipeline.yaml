@@ -44,6 +44,7 @@ jobs:
     with:
       directory: 'foundation'
       environment: 'foundation'
+      pre_run_sleep: 60
     secrets:
       ORG_ID: ${{ secrets.TF_VAR_ORG_ID }}
       BILLING_ACCOUNT: ${{ secrets.TF_VAR_BILLING_ACCOUNT }}
