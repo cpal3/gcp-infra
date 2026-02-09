@@ -102,7 +102,7 @@ jobs:
 
       - name: Terraform Apply
         id: apply
-        if: steps.changes.outputs.changed == 'true' && github.ref == 'refs/heads/main' && github.event_name == 'push'
+        if: (steps.changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
         run: |
           terraform apply -auto-approve -input=false
           echo "applied=true" >> $GITHUB_OUTPUT
