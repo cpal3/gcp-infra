@@ -22,7 +22,7 @@ projects:
       - logging.googleapis.com
       - bigquery.googleapis.com
       - storage.googleapis.com
-  prod-host:
+  prod-host1:
     folder: prod
     environment: prod
     apis:
