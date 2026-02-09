@@ -7,10 +7,6 @@ concurrency:
   group: terraform-deployment
   cancel-in-progress: false
 
-permissions:
-  contents: 'read'
-  id-token: 'write'
-
 on:
   push:
     branches:
@@ -30,6 +26,9 @@ on:
 jobs:
   bootstrap:
     name: "Bootstrap"
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     uses: ./.github/workflows/terraform-module.yaml
     with:
       directory: 'bootstrap'
@@ -44,6 +43,9 @@ jobs:
   foundation:
     name: "Foundation"
     needs: bootstrap
+    permissions:
+      contents: 'read'
+      id-token: 'write'
     uses: ./.github/workflows/terraform-module.yaml
     with:
       directory: 'foundation'
