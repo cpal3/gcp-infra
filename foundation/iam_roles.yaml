@@ -1,8 +1,9 @@
 # Foundation Layer IAM Roles
-# Roles managed by the Foundation layer for its own operations.
+# Use this file to manage roles for future service accounts (e.g., infra-runner).
+# Roles for the foundation-runner itself are now managed in the bootstrap layer.
 
 org_roles:
-  - roles/resourcemanager.folderAdmin
-  - roles/resourcemanager.projectCreator
-  - roles/orgpolicy.policyAdmin
-  - roles/logging.configWriter
+#  - roles/resourcemanager.folderAdmin
+#  - roles/resourcemanager.projectCreator
+#  - roles/orgpolicy.policyAdmin
+#  - roles/logging.configWriter

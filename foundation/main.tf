@@ -34,26 +34,7 @@ locals {
   iam_config = yamldecode(file("${path.module}/iam_roles.yaml"))
 }
 
-# --- RUNNER IAM (SELF-MANAGED) ---
-module "runner_org_iam" {
-  source    = "../modules/iam"
-  mode      = "organization"
-  target_id = var.org_id
-  bindings = [
-    for role in local.iam_config.org_roles : {
-      role   = role
-      member = "serviceAccount:terraform-runner@${var.project_id_prefix}-seed-project.iam.gserviceaccount.com"
-    }
-  ]
-}
-
-# --- IAM PROPAGATION WAIT ---
-# Role assignments are eventually consistent. We wait 60 seconds to ensure 
-# the Project Creator role is active across all regional endpoints.
-resource "time_sleep" "iam_propagation" {
-  create_duration = "60s"
-  depends_on      = [module.runner_org_iam]
-}
+# --- INFRASTRUCTURE RESOURCES ---
 
 module "folders" {
   source = "../modules/folder"
@@ -66,7 +47,6 @@ module "folders" {
     "common",
     "bootstrap"
   ]
-  depends_on = [time_sleep.iam_propagation]
 }
 
 # --- CENTRAL NETWORKING HUB ---
@@ -81,7 +61,6 @@ module "common_hub_net" {
   labels            = local.common_labels
   apis              = local.config.project_apis.hub_net
   deletion_protection = var.deletion_protection
-  depends_on        = [module.runner_org_iam]
 }
 
 # --- CENTRAL LOGGING ---
@@ -96,7 +75,6 @@ module "common_logging" {
   labels            = local.common_labels
   apis              = local.config.project_apis.logging
   deletion_protection = var.deletion_protection
-  depends_on        = [module.runner_org_iam]
 }
 
 # --- PROD SHARED VPC HOST ---
@@ -111,7 +89,6 @@ module "prod_host" {
   labels            = local.common_labels
   apis              = local.config.project_apis.prod_host
   deletion_protection = var.deletion_protection
-  depends_on        = [module.runner_org_iam]
 }
 
 # --- NON-PROD SHARED VPC HOST ---
@@ -126,7 +103,6 @@ module "non_prod_host" {
   labels            = local.common_labels
   apis              = local.config.project_apis.nonprod_host
   deletion_protection = var.deletion_protection
-  depends_on        = [module.runner_org_iam]
 }
 
 # --- DELETION PROTECTION (LIENS) ---

@@ -40,3 +40,12 @@ resource "google_service_account_iam_binding" "wif_impersonation" {
     "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${var.github_repo}"
   ]
 }
+
+resource "google_service_account_iam_binding" "foundation_wif_impersonation" {
+  service_account_id = google_service_account.foundation_runner.name
+  role               = "roles/iam.workloadIdentityUser"
+
+  members = [
+    "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${var.github_repo}"
+  ]
+}

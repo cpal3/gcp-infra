@@ -71,6 +71,15 @@ resource "google_service_account" "terraform_runner" {
   depends_on   = [google_project_service.additional_apis]
 }
 
+# --- FOUNDATION RUNNER SERVICE ACCOUNT ---
+
+resource "google_service_account" "foundation_runner" {
+  project      = google_project.seed_project.project_id
+  account_id   = "foundation-runner"
+  display_name = "Foundation Runner Service Account"
+  depends_on   = [google_project_service.additional_apis]
+}
+
 # --- TERRAFORM RUNNER IAM (YAML DRIVEN) ---
 
 locals {
@@ -97,6 +106,20 @@ module "runner_org_iam" {
     for role in local.iam_config.org_roles : {
       role   = role
       member = "serviceAccount:${google_service_account.terraform_runner.email}"
+    }
+  ]
+}
+
+# --- FOUNDATION RUNNER ORG IAM ---
+
+module "foundation_runner_org_iam" {
+  source    = "../modules/iam"
+  mode      = "organization"
+  target_id = var.org_id
+  bindings = [
+    for role in local.iam_config.foundation_org_roles : {
+      role   = role
+      member = "serviceAccount:${google_service_account.foundation_runner.email}"
     }
   ]
 }

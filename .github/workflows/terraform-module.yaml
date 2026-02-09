@@ -15,6 +15,10 @@ on:
         description: 'The environment name'
         required: true
         type: string
+      service_account:
+        description: 'The service account to use for Terraform'
+        required: true
+        type: string
       pre_run_sleep:
         description: 'Duration to sleep before running (to wait for IAM propagation)'
         required: false
@@ -80,7 +84,7 @@ jobs:
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: 'projects/671995239099/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
-          service_account: 'terraform-runner@ingr-seed-project.iam.gserviceaccount.com'
+          service_account: ${{ inputs.service_account }}
 
       - name: Setup Terraform
         if: steps.changes.outputs.changed == 'true'

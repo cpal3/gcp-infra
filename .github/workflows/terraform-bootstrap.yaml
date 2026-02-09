@@ -31,6 +31,7 @@ jobs:
     with:
       directory: 'bootstrap'
       environment: 'bootstrap'
+      service_account: 'terraform-runner@ingr-seed-project.iam.gserviceaccount.com'
     secrets:
       ORG_ID: ${{ secrets.TF_VAR_ORG_ID }}
       BILLING_ACCOUNT: ${{ secrets.TF_VAR_BILLING_ACCOUNT }}

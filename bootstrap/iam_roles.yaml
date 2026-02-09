@@ -12,3 +12,10 @@ project_roles:
   - roles/iam.workloadIdentityPoolAdmin
   - roles/iam.serviceAccountAdmin
   - roles/browser
+
+foundation_org_roles:
+  - roles/resourcemanager.folderAdmin
+  - roles/resourcemanager.projectCreator
+  - roles/orgpolicy.policyAdmin
+  - roles/logging.configWriter
+  - roles/billing.user

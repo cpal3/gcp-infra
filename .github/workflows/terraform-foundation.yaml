@@ -31,6 +31,7 @@ jobs:
     with:
       directory: 'foundation'
       environment: 'foundation'
+      service_account: 'foundation-runner@ingr-seed-project.iam.gserviceaccount.com'
       # removed needs: bootstrap dependency for true decoupling
     secrets:
       ORG_ID: ${{ secrets.TF_VAR_ORG_ID }}
