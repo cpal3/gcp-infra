@@ -55,6 +55,7 @@ module "common_hub_net" {
 
   name              = "hub-net"
   project_id_prefix = var.project_id_prefix
+  project_id        = "ingr-hub-net-763224ae"
   folder_id         = module.folders.ids["common"]
   billing_account   = var.billing_account
   environment       = "common"
@@ -69,6 +70,7 @@ module "common_logging" {
 
   name              = "logging"
   project_id_prefix = var.project_id_prefix
+  project_id        = "ingr-logging-763224ae"
   folder_id         = module.folders.ids["common"]
   billing_account   = var.billing_account
   environment       = "common"
@@ -83,6 +85,7 @@ module "prod_host" {
 
   name              = "prod-host"
   project_id_prefix = var.project_id_prefix
+  project_id        = "ingr-prod-host-763224ae"
   folder_id         = module.folders.ids["prod"]
   billing_account   = var.billing_account
   environment       = "prod"
@@ -97,6 +100,7 @@ module "non_prod_host" {
 
   name              = "nonprod-host"
   project_id_prefix = var.project_id_prefix
+  project_id        = "ingr-nonprod-host-763224ae"
   folder_id         = module.folders.ids["non-prod"]
   billing_account   = var.billing_account
   environment       = "non-prod"

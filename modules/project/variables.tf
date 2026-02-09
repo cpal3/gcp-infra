@@ -45,6 +45,12 @@ variable "apis" {
   ]
 }
 
+variable "project_id" {
+  description = "Optional project ID. If not provided, it will be generated from the prefix and name."
+  type        = string
+  default     = null
+}
+
 variable "deletion_protection" {
   description = "Whether to protect the project from deletion."
   type        = bool

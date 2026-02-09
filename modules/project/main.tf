@@ -3,7 +3,7 @@
 
 resource "google_project" "project" {
   name            = var.name
-  project_id      = "${var.project_id_prefix}-${var.name}"
+  project_id      = var.project_id != null ? var.project_id : "${var.project_id_prefix}-${var.name}"
   folder_id       = var.folder_id
   billing_account = var.billing_account
   labels          = merge(var.labels, { environment = var.environment })
