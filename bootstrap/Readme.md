@@ -69,6 +69,26 @@ Now that the bucket exists, we will move the local `terraform.tfstate` file to t
 
 **Success!** Your bootstrap state is now securely stored in GCS. You can delete the local `terraform.tfstate` and `terraform.tfstate.backup` files.
 
+## Portability: Using this for Any Organization
+
+This codebase is designed to be reusable across different GCP Organizations. To deploy to a new Org:
+
+1.  **Repository**: Clone or fork this repo.
+2.  **Phase 1 (Local)**: Run the steps in "Phase 1" using the new `org_id` and `billing_account`.
+3.  **Manual Unlock**: Follow the "Security & IAM" section below to grant the 4 mandatory roles to the new Service Account.
+4.  **GitHub Secrets**: Update the GitHub Repository Secrets with the values for the new Organization.
+
+### Manual vs. Automated Split
+
+| Task | Manual (One-Time) | Automated (Terraform) |
+| :--- | :---: | :---: |
+| Create Seed Project & Bucket | **Yes** (Phase 1) | No (Controlled by local apply) |
+| Grant WIF/Bucket Admin to Runner | No | **Yes** (via `bootstrap/main.tf`) |
+| Grant Org-Level Roles (Folders, etc.)| **Yes** (Initial unlock) | **Yes** (via `iam_roles.yaml`) |
+| Manage Folders & Environment Projects| No | **Yes** (via Foundation pipeline) |
+
+---
+
 ## Security & IAM
 
 To avoid "Permission Denied" errors during the initial bootstrap, you must manually grant several roles to the **Terraform Runner Service Account** at the **Organization Level**.
