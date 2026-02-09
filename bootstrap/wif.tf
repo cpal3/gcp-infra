@@ -30,19 +30,11 @@ resource "google_iam_workload_identity_pool_provider" "github_provider" {
   }
 }
 
-# --- BINDING: ALLOW GITHUB TO IMPERSONATE THE SA ---
+# --- BINDING: ALLOW GITHUB TO IMPERSONATE THE RUNNERS ---
 
 resource "google_service_account_iam_binding" "wif_impersonation" {
-  service_account_id = google_service_account.terraform_runner.name
-  role               = "roles/iam.workloadIdentityUser"
-
-  members = [
-    "principalSet://iam.googleapis.com/${google_iam_workload_identity_pool.github_pool.name}/attribute.repository/${var.github_repo}"
-  ]
-}
-
-resource "google_service_account_iam_binding" "foundation_wif_impersonation" {
-  service_account_id = google_service_account.foundation_runner.name
+  for_each           = google_service_account.runners
+  service_account_id = each.value.name
   role               = "roles/iam.workloadIdentityUser"
 
   members = [

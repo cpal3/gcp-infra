@@ -1,21 +1,32 @@
-# Core Bootstrap IAM Roles
-# These roles allow managing the Seed Project and granting roles in sub-layers.
+# Decoupled Bootstrap Configuration
+# Separate identity (service_accounts) from permissions (iam_roles).
 
-org_roles:
-  - roles/resourcemanager.organizationViewer
-  - roles/billing.user
+service_accounts:
+  terraform-runner:
+    display_name: "Terraform Runner (Bootstrap/Core)"
+  foundation-runner:
+    display_name: "Foundation Runner"
 
-project_roles:
-  - roles/storage.admin
-  - roles/serviceusage.serviceUsageAdmin
-  - roles/resourcemanager.projectIamAdmin
-  - roles/iam.workloadIdentityPoolAdmin
-  - roles/iam.serviceAccountAdmin
-  - roles/browser
+iam_roles:
+  terraform-runner:
+    org:
+      - roles/resourcemanager.organizationViewer
+      - roles/billing.user
+    project:
+      - roles/storage.admin
+      - roles/serviceusage.serviceUsageAdmin
+      - roles/resourcemanager.projectIamAdmin
+      - roles/iam.workloadIdentityPoolAdmin
+      - roles/iam.serviceAccountAdmin
+      - roles/browser
 
-foundation_org_roles:
-  - roles/resourcemanager.folderAdmin
-  - roles/resourcemanager.projectCreator
-  - roles/orgpolicy.policyAdmin
-  - roles/logging.configWriter
-  - roles/billing.user
+  foundation-runner:
+    org:
+      - roles/resourcemanager.folderAdmin
+      - roles/resourcemanager.projectCreator
+      - roles/orgpolicy.policyAdmin
+      - roles/logging.configWriter
+      - roles/billing.user
+    project:
+      - roles/storage.admin
+      - roles/browser

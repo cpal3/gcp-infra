@@ -62,67 +62,64 @@ resource "google_storage_bucket" "tf_state" {
   depends_on = [google_project_service.additional_apis]
 }
 
-# --- TERRAFORM RUNNER SERVICE ACCOUNT ---
+# --- TERRAFORM RUNNERS (DYNAMIC CREATION) ---
 
-resource "google_service_account" "terraform_runner" {
+resource "google_service_account" "runners" {
+  for_each     = local.iam_config.service_accounts
   project      = google_project.seed_project.project_id
-  account_id   = "terraform-runner"
-  display_name = "Terraform Runner Service Account"
+  account_id   = each.key
+  display_name = lookup(each.value, "display_name", "${each.key} Service Account")
   depends_on   = [google_project_service.additional_apis]
 }
 
-# --- FOUNDATION RUNNER SERVICE ACCOUNT ---
-
-resource "google_service_account" "foundation_runner" {
-  project      = google_project.seed_project.project_id
-  account_id   = "foundation-runner"
-  display_name = "Foundation Runner Service Account"
-  depends_on   = [google_project_service.additional_apis]
-}
-
-# --- TERRAFORM RUNNER IAM (YAML DRIVEN) ---
+# --- TERRAFORM RUNNERS IAM (DYNAMIC) ---
 
 locals {
   iam_config = yamldecode(file("${path.module}/iam_roles.yaml"))
+
+  # Map runner names to their service account emails dynamically
+  runner_emails = {
+    for name, sa in google_service_account.runners : name => sa.email
+  }
+
+  # Flatten org roles for all runners
+  org_iam_bindings = flatten([
+    for runner_name, config in local.iam_config.iam_roles : [
+      for role in config.org : {
+        role   = role
+        member = "serviceAccount:${local.runner_emails[runner_name]}"
+      }
+    ]
+  ])
+
+  # Flatten project roles for all runners
+  project_iam_bindings = flatten([
+    for runner_name, config in local.iam_config.iam_roles : [
+      for role in config.project : {
+        role   = role
+        member = "serviceAccount:${local.runner_emails[runner_name]}"
+      }
+    ]
+  ])
 }
 
 module "runner_project_iam" {
   source    = "../modules/iam"
   mode      = "project"
   target_id = google_project.seed_project.project_id
-  bindings = [
-    for role in local.iam_config.project_roles : {
-      role   = role
-      member = "serviceAccount:${google_service_account.terraform_runner.email}"
-    }
-  ]
+  bindings  = local.project_iam_bindings
 }
 
 module "runner_org_iam" {
   source    = "../modules/iam"
   mode      = "organization"
   target_id = var.org_id
-  bindings = [
-    for role in local.iam_config.org_roles : {
-      role   = role
-      member = "serviceAccount:${google_service_account.terraform_runner.email}"
-    }
-  ]
+  bindings  = local.org_iam_bindings
 }
 
-# --- FOUNDATION RUNNER ORG IAM ---
-
-module "foundation_runner_org_iam" {
-  source    = "../modules/iam"
-  mode      = "organization"
-  target_id = var.org_id
-  bindings = [
-    for role in local.iam_config.foundation_org_roles : {
-      role   = role
-      member = "serviceAccount:${google_service_account.foundation_runner.email}"
-    }
-  ]
+# Output all runner emails
+output "runner_emails" {
+  value = {
+    for name, sa in google_service_account.runners : name => sa.email
+  }
 }
-
-# Ideally, this SA needs Org Admin or Folder Admin to create subsequent projects.
-# We output its email so you can grant it those permissions manually or via a separate step.
