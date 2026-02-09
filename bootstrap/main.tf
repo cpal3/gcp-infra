@@ -40,6 +40,7 @@ resource "google_project_service" "additional_apis" {
     "cloudbilling.googleapis.com",
     "serviceusage.googleapis.com",
     "storage-api.googleapis.com",
+    "logging.googleapis.com",
     "iamcredentials.googleapis.com" # Required for WIF
   ])
   service = each.key
