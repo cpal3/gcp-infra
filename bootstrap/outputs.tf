@@ -10,7 +10,7 @@ output "terraform_state_bucket" {
 
 output "terraform_runner_service_account_email" {
   description = "The email of the Service Account to be used by CI/CD."
-  value       = google_service_account.terraform_runner.email
+  value       = google_service_account.runners["terraform-runner"].email
 }
 
 output "workload_identity_provider" {
