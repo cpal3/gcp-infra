@@ -23,14 +23,6 @@ locals {
   }
   config = yamldecode(file("${path.module}/config.yaml"))
 
-  # Helper to identify projects for liens
-  project_ids = {
-    common-hub-net = module.common_hub_net.project_id
-    common-logging = module.common_logging.project_id
-    prod-host      = module.prod_host.project_id
-    non-prod-host  = module.non_prod_host.project_id
-  }
-
   iam_config = yamldecode(file("${path.module}/iam_roles.yaml"))
 }
 
@@ -41,79 +33,30 @@ module "folders" {
 
   parent_id           = "organizations/${var.org_id}"
   deletion_protection = var.deletion_protection
-  names = [
-    "prod",
-    "non-prod",
-    "common",
-    "bootstrap"
-  ]
+  names               = local.config.folders
 }
 
-# --- CENTRAL NETWORKING HUB ---
-module "common_hub_net" {
-  source = "../modules/project"
+# --- DYNAMIC PROJECTS ---
+module "projects" {
+  source   = "../modules/project"
+  for_each = local.config.projects
 
-  name              = "hub-net"
+  name              = each.key
   project_id_prefix = var.project_id_prefix
-  project_id        = "ingr-hub-net-763224ae"
-  folder_id         = module.folders.ids["common"]
+  project_id        = lookup(each.value, "project_id", null)
+  folder_id         = module.folders.ids[each.value.folder]
   billing_account   = var.billing_account
-  environment       = "common"
+  environment       = each.value.environment
   labels            = local.common_labels
-  apis              = local.config.project_apis.hub_net
-  deletion_protection = var.deletion_protection
-}
-
-# --- CENTRAL LOGGING ---
-module "common_logging" {
-  source = "../modules/project"
-
-  name              = "logging"
-  project_id_prefix = var.project_id_prefix
-  project_id        = "ingr-logging-763224ae"
-  folder_id         = module.folders.ids["common"]
-  billing_account   = var.billing_account
-  environment       = "common"
-  labels            = local.common_labels
-  apis              = local.config.project_apis.logging
-  deletion_protection = var.deletion_protection
-}
-
-# --- PROD SHARED VPC HOST ---
-module "prod_host" {
-  source = "../modules/project"
-
-  name              = "prod-host"
-  project_id_prefix = var.project_id_prefix
-  project_id        = "ingr-prod-host-763224ae"
-  folder_id         = module.folders.ids["prod"]
-  billing_account   = var.billing_account
-  environment       = "prod"
-  labels            = local.common_labels
-  apis              = local.config.project_apis.prod_host
-  deletion_protection = var.deletion_protection
-}
-
-# --- NON-PROD SHARED VPC HOST ---
-module "non_prod_host" {
-  source = "../modules/project"
-
-  name              = "nonprod-host"
-  project_id_prefix = var.project_id_prefix
-  project_id        = "ingr-nonprod-host-763224ae"
-  folder_id         = module.folders.ids["non-prod"]
-  billing_account   = var.billing_account
-  environment       = "non-prod"
-  labels            = local.common_labels
-  apis              = local.config.project_apis.nonprod_host
+  apis              = each.value.apis
   deletion_protection = var.deletion_protection
 }
 
 # --- DELETION PROTECTION (LIENS) ---
 resource "google_resource_manager_lien" "project_liens" {
-  for_each = var.deletion_protection ? local.project_ids : {}
+  for_each = var.deletion_protection ? module.projects : {}
 
-  parent       = "projects/${each.value}"
+  parent       = "projects/${each.value.project_id}"
   restrictions = ["resourcemanager.projects.delete"]
   origin       = "terraform-foundation-protection"
   reason       = "Enterprise Landing Zone Foundation Project. Essential resource."
@@ -147,7 +90,7 @@ resource "google_organization_policy" "org_policies" {
 
 # 1. Create a Log Bucket in the Logging Project
 resource "google_logging_project_bucket_config" "org_log_bucket" {
-  project        = module.common_logging.project_id
+  project        = module.projects["logging"].project_id
   location       = "global"
   retention_days = 30
   bucket_id      = "org-central-logs"
@@ -164,7 +107,7 @@ resource "google_logging_organization_sink" "org_sink" {
 
 # 3. Grant the Sink's Service Account permission to write to the Logging Project
 resource "google_project_iam_member" "log_sink_member" {
-  project = module.common_logging.project_id
+  project = module.projects["logging"].project_id
   role    = "roles/logging.bucketWriter"
   member  = google_logging_organization_sink.org_sink.writer_identity
 }

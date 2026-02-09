@@ -1,22 +1,39 @@
 # Foundation Configuration
-# Drive APIs and Organization Policies from this file.
-#
+# Drive folders, projects, APIs, and Organization Policies from this file.
 
-project_apis:
-  hub_net:
-    - compute.googleapis.com
-    - servicenetworking.googleapis.com
-    - dns.googleapis.com
+folders:
+  - prod
+  - non-prod
+  - common
+  - bootstrap
+
+projects:
+  hub-net:
+    folder: common
+    environment: common
+    apis:
+      - compute.googleapis.com
+      - servicenetworking.googleapis.com
+      - dns.googleapis.com
   logging:
-    - logging.googleapis.com
-    - bigquery.googleapis.com
-    - storage.googleapis.com
-  prod_host:
-    - compute.googleapis.com
-    - container.googleapis.com
-  nonprod_host:
-    - compute.googleapis.com
-    - container.googleapis.com
+    folder: common
+    environment: common
+    apis:
+      - logging.googleapis.com
+      - bigquery.googleapis.com
+      - storage.googleapis.com
+  prod-host:
+    folder: prod
+    environment: prod
+    apis:
+      - compute.googleapis.com
+      - container.googleapis.com
+  nonprod-host:
+    folder: non-prod
+    environment: non-prod
+    apis:
+      - compute.googleapis.com
+      - container.googleapis.com
 
 org_policies:
   - constraint: constraints/iam.disableServiceAccountKeyCreation

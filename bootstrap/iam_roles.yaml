@@ -24,6 +24,8 @@ iam_roles:
     org:
       - roles/resourcemanager.folderAdmin
       - roles/resourcemanager.projectCreator
+      - roles/resourcemanager.organizationViewer
+      - roles/browser
       - roles/orgpolicy.policyAdmin
       - roles/logging.configWriter
       - roles/billing.user
