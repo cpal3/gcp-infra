@@ -31,6 +31,8 @@ iam_roles:
       - roles/orgpolicy.policyAdmin
       - roles/logging.configWriter
       - roles/billing.user
+      - roles/compute.xpnAdmin
+      - roles/compute.networkAdmin
     project:
       - roles/storage.admin
       - roles/browser
