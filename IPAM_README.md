@@ -115,7 +115,7 @@ module "ipam" {
 subnets = [
   {
     name   = "prod-subnet-asia-south1"
-    cidr   = module.ipam.ipam_primary_subnets.prod["asia-south1"]
+    cidr   = module.ipam.ipam_primary_subnets.Prod["prod-subnet-asia-south1"]
     region = "asia-south1"
   }
 ]

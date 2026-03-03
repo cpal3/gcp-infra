@@ -1,5 +1,5 @@
 Environment,Resource_Type,Resource_Name,CIDR,IP_Count,Region,Status,Allocated_Date,Notes
-# Environment Blocks no longer consume fixed /18 static reservations.
+
 Common,Subnet,transit-routing-core,10.1.0.0/22,1022,global,Allocated,2026-03-03,Transit routing core
 Common,Subnet,palo-alto-ha,10.1.4.0/26,62,global,Allocated,2026-03-03,Palo Alto HA
 Common,Subnet,ilb-vip-pool,10.1.4.64/26,62,global,Allocated,2026-03-03,ILB VIP pool

@@ -33,11 +33,11 @@ locals {
     if alloc.Status == "Allocated" && alloc.Resource_Type == "Subnet"
   ]
   
-  # Group by Environment -> Region -> CIDR string
-  # Example: primary_subnet["Production"]["asia-south1"] = "10.0.64.0/22"
+  # Group by Environment -> Resource_Name -> CIDR string
+  # Example: primary_subnet["Prod"]["prod-subnet-asia-south1"] = "10.1.64.0/24"
   primary_subnet = {
     for env in distinct([for a in local.primary_allocs : a.Environment]) : env => {
-      for a in local.primary_allocs : a.Region => a.CIDR
+      for a in local.primary_allocs : a.Resource_Name => a.CIDR
       if a.Environment == env
     }
   }
@@ -50,7 +50,7 @@ locals {
   
   gke_pods = {
     for env in distinct([for a in local.gke_pod_allocs : a.Environment]) : env => {
-      for a in local.gke_pod_allocs : a.Region => a.CIDR
+      for a in local.gke_pod_allocs : a.Resource_Name => a.CIDR
       if a.Environment == env
     }
   }
@@ -63,7 +63,7 @@ locals {
   
   gke_services = {
     for env in distinct([for a in local.gke_service_allocs : a.Environment]) : env => {
-      for a in local.gke_service_allocs : a.Region => a.CIDR
+      for a in local.gke_service_allocs : a.Resource_Name => a.CIDR
       if a.Environment == env
     }
   }
