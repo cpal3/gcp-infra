@@ -41,3 +41,62 @@ org_policies:
   - constraint: constraints/compute.vmExternalIpAccess
     enforce: true
     is_list: true # Boolean vs List policy handling
+
+# VPC Network Configuration
+# IP Allocation is driven sequentially by the Dynamic IPAM script logic from ipam.csv 
+# Master Range for all environments: 10.1.0.0/16 (split per Environment Tier Base Blocks)
+
+vpcs:
+  hub-vpc:
+    project: hub-net
+    routing_mode: REGIONAL
+    enable_shared_vpc_host: false
+    enable_flow_logs: true
+    subnets:
+      - name: hub-subnet-asia-south1
+        cidr: 10.1.0.0/22
+        region: asia-south1
+
+  prod-vpc:
+    project: prod-host1
+    routing_mode: REGIONAL
+    enable_shared_vpc_host: true
+    enable_flow_logs: true
+    subnets:
+      - name: prod-subnet-asia-south1
+        cidr: 10.1.64.0/24
+        region: asia-south1
+        secondary_ranges:
+          - name: gke-pods
+            cidr: 10.1.72.0/21
+          - name: gke-services
+            cidr: 10.1.65.0/25
+
+  nonprod-vpc:
+    project: nonprod-host
+    routing_mode: REGIONAL
+    enable_shared_vpc_host: true
+    enable_flow_logs: true
+    subnets:
+      - name: nonprod-subnet-asia-south1
+        cidr: 10.1.128.0/24
+        region: asia-south1
+        secondary_ranges:
+          - name: gke-pods
+            cidr: 10.1.136.0/21
+          - name: gke-services
+            cidr: 10.1.129.0/25
+
+# VPC Peering (Hub-and-Spoke)
+peerings:
+  - name: hub-to-prod
+    network: hub-vpc
+    peer_network: prod-vpc
+    export_custom_routes: true
+    import_custom_routes: true
+  
+  - name: hub-to-nonprod
+    network: hub-vpc
+    peer_network: nonprod-vpc
+    export_custom_routes: true
+    import_custom_routes: true

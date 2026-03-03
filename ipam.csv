@@ -1,0 +1,16 @@
+Environment,Resource_Type,Resource_Name,CIDR,IP_Count,Region,Status,Allocated_Date,Notes
+# Environment Blocks no longer consume fixed /18 static reservations.
+Common,Subnet,transit-routing-core,10.1.0.0/22,1022,global,Allocated,2026-03-03,Transit routing core
+Common,Subnet,palo-alto-ha,10.1.4.0/26,62,global,Allocated,2026-03-03,Palo Alto HA
+Common,Subnet,ilb-vip-pool,10.1.4.64/26,62,global,Allocated,2026-03-03,ILB VIP pool
+Common,Subnet,nat,10.1.4.128/26,62,global,Allocated,2026-03-03,NAT
+Common,Subnet,shared-services,10.1.8.0/22,1022,global,Allocated,2026-03-03,Shared services
+
+Prod,Subnet,prod-subnet-asia-south1,10.1.64.0/24,254,asia-south1,Allocated,2026-03-03,Primary subnet (Nodes)
+Prod,Secondary,gke-pods-asia-south1,10.1.72.0/21,2046,asia-south1,Allocated,2026-03-03,GKE pod IPs
+Prod,Secondary,gke-services-asia-south1,10.1.65.0/25,126,asia-south1,Allocated,2026-03-03,GKE service IPs
+
+PreProd,Subnet,preprod-subnet-asia-south1,10.1.128.0/24,254,asia-south1,Allocated,2026-03-03,Primary subnet (Nodes)
+PreProd,Secondary,gke-pods-asia-south1,10.1.136.0/21,2046,asia-south1,Allocated,2026-03-03,GKE pod IPs
+PreProd,Secondary,gke-services-asia-south1,10.1.129.0/25,126,asia-south1,Allocated,2026-03-03,GKE service IPs
+

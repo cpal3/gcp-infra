@@ -1,11 +1,7 @@
+# Provider version configuration is centralized in ../provider_versions.tf
+# This ensures consistency across all infrastructure layers.
+
 terraform {
-  required_version = ">= 1.0"
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = ">= 4.0"
-    }
-  }
   backend "gcs" {
     bucket = "ingr-seed-project-tfstate"
     prefix = "terraform/foundation"
@@ -24,6 +20,11 @@ locals {
   config = yamldecode(file("${path.module}/config.yaml"))
 
   iam_config = yamldecode(file("${path.module}/iam_roles.yaml"))
+}
+
+# IPAM Module for automatic IP allocation
+module "ipam" {
+  source = "../modules/ipam"
 }
 
 # --- INFRASTRUCTURE RESOURCES ---
@@ -110,4 +111,47 @@ resource "google_project_iam_member" "log_sink_member" {
   project = module.projects["logging"].project_id
   role    = "roles/logging.bucketWriter"
   member  = google_logging_organization_sink.org_sink.writer_identity
+}
+
+# --- VPC NETWORKS ---
+
+module "vpcs" {
+  source   = "../modules/network"
+  for_each = lookup(local.config, "vpcs", {})
+
+  project_id              = module.projects[each.value.project].project_id
+  network_name            = each.key
+  routing_mode            = each.value.routing_mode
+  enable_shared_vpc_host  = each.value.enable_shared_vpc_host
+  enable_flow_logs        = each.value.enable_flow_logs
+  subnets                 = each.value.subnets
+
+  depends_on = [module.projects]
+}
+
+# --- VPC PEERING ---
+
+resource "google_compute_network_peering" "peerings" {
+  for_each = { for p in lookup(local.config, "peerings", []) : "${p.name}-primary" => p }
+
+  name                 = each.value.name
+  network              = module.vpcs[each.value.network].network_self_link
+  peer_network         = module.vpcs[each.value.peer_network].network_self_link
+  export_custom_routes = lookup(each.value, "export_custom_routes", false)
+  import_custom_routes = lookup(each.value, "import_custom_routes", false)
+
+  depends_on = [module.vpcs]
+}
+
+# Reverse peering (required for bidirectional peering)
+resource "google_compute_network_peering" "peerings_reverse" {
+  for_each = { for p in lookup(local.config, "peerings", []) : "${p.name}-reverse" => p }
+
+  name                 = "${each.value.name}-reverse"
+  network              = module.vpcs[each.value.peer_network].network_self_link
+  peer_network         = module.vpcs[each.value.network].network_self_link
+  export_custom_routes = lookup(each.value, "import_custom_routes", false)
+  import_custom_routes = lookup(each.value, "export_custom_routes", false)
+
+  depends_on = [module.vpcs]
 }

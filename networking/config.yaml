@@ -1,0 +1,61 @@
+# Networking Configuration
+# Defines VPCs, subnets, and peering for Hub-and-Spoke architecture
+
+# VPC Configurations
+vpcs:
+  hub-vpc:
+    project: hub-net
+    routing_mode: REGIONAL
+    enable_shared_vpc_host: false
+    enable_flow_logs: true
+    subnets:
+      - name: hub-subnet-asia-south1
+        cidr: 10.0.0.0/24
+        region: asia-south1
+        private_google_access: true
+
+  prod-vpc:
+    project: prod-host1
+    routing_mode: REGIONAL
+    enable_shared_vpc_host: true  # Enable Shared VPC for service projects
+    enable_flow_logs: true
+    subnets:
+      - name: prod-subnet-asia-south1
+        cidr: 10.1.0.0/24
+        region: asia-south1
+        private_google_access: true
+        secondary_ranges:
+          - name: gke-pods
+            cidr: 10.10.0.0/16
+          - name: gke-services
+            cidr: 10.11.0.0/20
+
+  nonprod-vpc:
+    project: nonprod-host
+    routing_mode: REGIONAL
+    enable_shared_vpc_host: true  # Enable Shared VPC for service projects
+    enable_flow_logs: true
+    subnets:
+      - name: nonprod-subnet-asia-south1
+        cidr: 10.2.0.0/24
+        region: asia-south1
+        private_google_access: true
+        secondary_ranges:
+          - name: gke-pods
+            cidr: 10.20.0.0/16
+          - name: gke-services
+            cidr: 10.21.0.0/20
+
+# VPC Peering (Hub-and-Spoke)
+peerings:
+  - name: hub-to-prod
+    network: hub-vpc
+    peer_network: prod-vpc
+    export_custom_routes: true
+    import_custom_routes: true
+  
+  - name: hub-to-nonprod
+    network: hub-vpc
+    peer_network: nonprod-vpc
+    export_custom_routes: true
+    import_custom_routes: true

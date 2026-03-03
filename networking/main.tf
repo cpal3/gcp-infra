@@ -1,69 +1,64 @@
-# =====================
-# PROD Network Stack
-# =====================
-module "prod_host_project" {
-  source = "../modules/project"
+# Provider version configuration is centralized in ../provider_versions.tf
+# This ensures consistency across all infrastructure layers.
 
-  name            = "prod-vpc-host"
-  project_id_prefix = "prod-host"
-  folder_id       = var.prod_folder_id
-  billing_account = var.billing_account
-  environment     = "prod"
-  labels = {
-    cost_center = "infrastructure"
-    owner       = "platform-team"
-    type        = "host-project"
+terraform {
+  backend "gcs" {
+    bucket = "ingr-seed-project-tfstate"
+    prefix = "terraform/networking"
   }
 }
 
-module "prod_vpc" {
-  source = "../modules/network"
-
-  project_id   = module.prod_host_project.project_id
-  network_name = "prod-vpc"
-  subnets = [
-    {
-      name   = "prod-subnet-a"
-      cidr   = "10.0.1.0/24"
-      region = var.region
-      secondary_ranges = [
-          { name = "pods", cidr = "10.1.0.0/16" }
-      ]
-    }
-  ]
+provider "google" {
+  region = var.region
 }
 
-# =====================
-# NON-PROD Network Stack
-# =====================
-module "non_prod_host_project" {
-  source = "../modules/project"
+locals {
+  config = yamldecode(file("${path.module}/config.yaml"))
+  
+  # Extract project IDs from foundation outputs
+  # We'll use data sources to reference existing projects
+}
 
-  name            = "non-prod-vpc-host"
-  project_id_prefix = "np-host"
-  folder_id       = var.non_prod_folder_id
-  billing_account = var.billing_account
-  environment     = "non-prod"
-  labels = {
-    cost_center = "infrastructure"
-    owner       = "platform-team"
-    type        = "host-project"
+# Data sources to reference foundation projects
+data "terraform_remote_state" "foundation" {
+  backend = "gcs"
+  config = {
+    bucket = "ingr-seed-project-tfstate"
+    prefix = "terraform/foundation"
   }
 }
 
-module "non_prod_vpc" {
-  source = "../modules/network"
+# Create VPCs using the network module
+module "vpcs" {
+  source   = "../modules/network"
+  for_each = local.config.vpcs
 
-  project_id   = module.non_prod_host_project.project_id
-  network_name = "non-prod-vpc"
-  subnets = [
-    {
-      name   = "np-subnet-a"
-      cidr   = "10.10.1.0/24"
-      region = var.region
-      secondary_ranges = [
-          { name = "pods", cidr = "10.11.0.0/16" }
-      ]
-    }
-  ]
+  project_id              = data.terraform_remote_state.foundation.outputs.project_ids[each.value.project]
+  network_name            = each.key
+  routing_mode            = each.value.routing_mode
+  enable_shared_vpc_host  = each.value.enable_shared_vpc_host
+  enable_flow_logs        = each.value.enable_flow_logs
+  subnets                 = each.value.subnets
+}
+
+# VPC Peering Connections
+resource "google_compute_network_peering" "peerings" {
+  for_each = { for p in local.config.peerings : "${p.name}-primary" => p }
+
+  name                 = each.value.name
+  network              = module.vpcs[each.value.network].network_self_link
+  peer_network         = module.vpcs[each.value.peer_network].network_self_link
+  export_custom_routes = lookup(each.value, "export_custom_routes", false)
+  import_custom_routes = lookup(each.value, "import_custom_routes", false)
+}
+
+# Reverse peering (required for bidirectional peering)
+resource "google_compute_network_peering" "peerings_reverse" {
+  for_each = { for p in local.config.peerings : "${p.name}-reverse" => p }
+
+  name                 = "${each.value.name}-reverse"
+  network              = module.vpcs[each.value.peer_network].network_self_link
+  peer_network         = module.vpcs[each.value.network].network_self_link
+  export_custom_routes = lookup(each.value, "import_custom_routes", false)
+  import_custom_routes = lookup(each.value, "export_custom_routes", false)
 }
