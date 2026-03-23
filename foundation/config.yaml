@@ -22,21 +22,21 @@ projects:
       - logging.googleapis.com
       - bigquery.googleapis.com
       - storage.googleapis.com
-  prod-host1:
-    folder: prod
-    environment: prod
-    apis:
-      - compute.googleapis.com
-      - container.googleapis.com
+#  prod-host1:
+#    folder: prod
+#    environment: prod
+#    apis:
+#      - compute.googleapis.com
+#      - container.googleapis.com
   nonprod-host:
     folder: non-prod
     environment: non-prod
     apis:
       - compute.googleapis.com
       - container.googleapis.com
-  app-backend-prod:
-    folder: prod
-    environment: prod
+  app-backend-nonprod:
+    folder: non-prod
+    environment: non-prod
     apis:
       - compute.googleapis.com
 
@@ -62,20 +62,20 @@ vpcs:
         cidr: 10.1.0.0/22
         region: asia-south1
 
-  prod-vpc:
-    project: prod-host1
-    routing_mode: REGIONAL
-    enable_shared_vpc_host: true
-    enable_flow_logs: true
-    subnets:
-      - name: prod-subnet-asia-south1
-        cidr: 10.1.64.0/24
-        region: asia-south1
-        secondary_ranges:
-          - name: gke-pods
-            cidr: 10.1.72.0/21
-          - name: gke-services
-            cidr: 10.1.65.0/25
+#  prod-vpc:
+#    project: prod-host1
+#    routing_mode: REGIONAL
+#    enable_shared_vpc_host: true
+#    enable_flow_logs: true
+#    subnets:
+#      - name: prod-subnet-asia-south1
+#        cidr: 10.1.64.0/24
+#        region: asia-south1
+#        secondary_ranges:
+#          - name: gke-pods
+#            cidr: 10.1.72.0/21
+#          - name: gke-services
+#            cidr: 10.1.65.0/25
 
   nonprod-vpc:
     project: nonprod-host
@@ -94,11 +94,11 @@ vpcs:
 
 # VPC Peering (Hub-and-Spoke)
 peerings:
-  - name: hub-to-prod
-    network: hub-vpc
-    peer_network: prod-vpc
-    export_custom_routes: true
-    import_custom_routes: true
+#  - name: hub-to-prod
+#    network: hub-vpc
+#    peer_network: prod-vpc
+#    export_custom_routes: true
+#    import_custom_routes: true
   
   - name: hub-to-nonprod
     network: hub-vpc
@@ -109,9 +109,9 @@ peerings:
 # Project Attachments
 # Attaches service projects to Shared VPCs and grants Subnet access
 project_attachments:
-  - service_project: app-backend-prod
-    host_project: prod-host1
-    subnetwork: prod-subnet-asia-south1
+  - service_project: app-backend-nonprod
+    host_project: nonprod-host
+    subnetwork: nonprod-subnet-asia-south1
     region: asia-south1
     # users:
-    #   - "serviceAccount:my-sa@app-backend-prod.iam.gserviceaccount.com"
+    #   - "serviceAccount:my-sa@app-backend-nonprod.iam.gserviceaccount.com"
