@@ -2,11 +2,12 @@
 # Uniqueness is managed by the var.name and var.project_id_prefix.
 
 resource "google_project" "project" {
-  name            = var.name
-  project_id      = var.project_id != null ? var.project_id : "${var.project_id_prefix}-${var.name}"
-  folder_id       = var.folder_id
-  billing_account = var.billing_account
-  labels          = merge(var.labels, { environment = var.environment })
+  name                = var.name
+  project_id          = var.project_id != null ? var.project_id : "${var.project_id_prefix}-${var.name}"
+  folder_id           = var.folder_id
+  billing_account     = var.billing_account
+  labels              = merge(var.labels, { environment = var.environment })
+  auto_create_network = false
 
   # Allow destruction if the variable is false
   deletion_policy = var.deletion_protection ? "PREVENT" : "DELETE"

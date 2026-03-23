@@ -46,6 +46,8 @@ org_policies:
   - constraint: constraints/compute.vmExternalIpAccess
     enforce: true
     is_list: true # Boolean vs List policy handling
+  - constraint: constraints/compute.skipDefaultNetworkCreation
+    enforce: true
 
 # VPC Network Configuration
 # IP Allocation is driven sequentially by the Dynamic IPAM script logic from ipam.csv 
