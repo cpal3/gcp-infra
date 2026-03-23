@@ -113,5 +113,8 @@ project_attachments:
     host_project: nonprod-host
     subnetwork: nonprod-subnet-asia-south1
     region: asia-south1
-    # users:
-    #   - "serviceAccount:my-sa@app-backend-nonprod.iam.gserviceaccount.com"
+
+service_accounts:
+  - project: app-backend-nonprod
+    account_id: app-sa
+    display_name: "App Backend Service Account"

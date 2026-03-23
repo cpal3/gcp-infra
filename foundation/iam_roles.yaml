@@ -7,3 +7,20 @@ org_roles:
 #  - roles/resourcemanager.projectCreator
 #  - roles/orgpolicy.policyAdmin
 #  - roles/logging.configWriter
+
+project_iam_bindings:
+  - project: app-backend-nonprod
+    roles:
+      - roles/compute.instanceAdmin.v1
+      - roles/run.admin
+    members:
+      - "serviceAccount:app-sa@ingr-app-backend-nonprod.iam.gserviceaccount.com"
+
+subnetwork_iam_bindings:
+  - project: nonprod-host
+    region: asia-south1
+    subnetwork: nonprod-subnet-asia-south1
+    roles:
+      - roles/compute.networkUser
+    members:
+      - "serviceAccount:app-sa@ingr-app-backend-nonprod.iam.gserviceaccount.com"

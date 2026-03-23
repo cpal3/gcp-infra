@@ -156,6 +156,70 @@ resource "google_compute_network_peering" "peerings_reverse" {
   depends_on = [module.vpcs]
 }
 
+# --- SERVICE ACCOUNTS ---
+
+resource "google_service_account" "service_accounts" {
+  for_each = { for sa in lookup(local.config, "service_accounts", []) : "${sa.project}-${sa.account_id}" => sa }
+
+  account_id   = each.value.account_id
+  display_name = lookup(each.value, "display_name", "Service Account ${each.value.account_id}")
+  project      = module.projects[each.value.project].project_id
+}
+
+# --- PROJECT IAM BINDINGS ---
+
+locals {
+  # Flatten the project_iam_bindings list from iam_roles.yaml to iterate easily
+  flattened_project_iam = flatten([
+    for binding in lookup(local.iam_config, "project_iam_bindings", []) : [
+      for role in try(binding.roles, length(try(binding.role, "")) > 0 ? [binding.role] : []) : [
+        for member in binding.members : {
+          project = binding.project
+          role    = role
+          member  = member
+        }
+      ]
+    ]
+  ])
+
+  # Flatten the subnetwork_iam_bindings list from iam_roles.yaml
+  flattened_subnetwork_iam = flatten([
+    for binding in lookup(local.iam_config, "subnetwork_iam_bindings", []) : [
+      for role in try(binding.roles, length(try(binding.role, "")) > 0 ? [binding.role] : []) : [
+        for member in binding.members : {
+          project    = binding.project
+          region     = binding.region
+          subnetwork = binding.subnetwork
+          role       = role
+          member     = member
+        }
+      ]
+    ]
+  ])
+}
+
+resource "google_compute_subnetwork_iam_member" "subnetwork_iam_bindings" {
+  for_each = { for b in local.flattened_subnetwork_iam : "${b.project}-${b.region}-${b.subnetwork}-${b.role}-${b.member}" => b }
+
+  project    = try(module.projects[each.value.project].project_id, each.value.project)
+  region     = each.value.region
+  subnetwork = each.value.subnetwork
+  role       = each.value.role
+  member     = each.value.member
+
+  depends_on = [module.project_attachments, google_service_account.service_accounts]
+}
+
+resource "google_project_iam_member" "project_iam_bindings" {
+  for_each = { for b in local.flattened_project_iam : "${b.project}-${b.role}-${b.member}" => b }
+
+  project = module.projects[each.value.project].project_id
+  role    = each.value.role
+  member  = each.value.member
+
+  depends_on = [google_service_account.service_accounts]
+}
+
 # --- SHARED VPC PROJECT ATTACHMENTS ---
 
 module "project_attachments" {
