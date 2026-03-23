@@ -8,7 +8,7 @@ terraform {
   required_providers {
     google = {
       source  = "hashicorp/google"
-      version = "~> 6.0"  # Using v6.x for stability on 32-bit systems
+      version = "6.45.0"  # Pinned to avoid v6.50.0 crashes
     }
   }
 }

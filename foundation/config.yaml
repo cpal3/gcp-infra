@@ -34,6 +34,11 @@ projects:
     apis:
       - compute.googleapis.com
       - container.googleapis.com
+  app-backend-prod:
+    folder: prod
+    environment: prod
+    apis:
+      - compute.googleapis.com
 
 org_policies:
   - constraint: constraints/iam.disableServiceAccountKeyCreation
@@ -100,3 +105,13 @@ peerings:
     peer_network: nonprod-vpc
     export_custom_routes: true
     import_custom_routes: true
+
+# Project Attachments
+# Attaches service projects to Shared VPCs and grants Subnet access
+project_attachments:
+  - service_project: app-backend-prod
+    host_project: prod-host1
+    subnetwork: prod-subnet-asia-south1
+    region: asia-south1
+    # users:
+    #   - "serviceAccount:my-sa@app-backend-prod.iam.gserviceaccount.com"

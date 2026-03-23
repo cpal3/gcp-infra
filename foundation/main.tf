@@ -155,3 +155,20 @@ resource "google_compute_network_peering" "peerings_reverse" {
 
   depends_on = [module.vpcs]
 }
+
+# --- SHARED VPC PROJECT ATTACHMENTS ---
+
+module "project_attachments" {
+  source   = "../modules/project_attachment"
+  for_each = { for idx, att in lookup(local.config, "project_attachments", []) : "${att.host_project}-${att.service_project}" => att }
+
+  # Look up dynamically created projects if they reside in the same config
+  host_project_id    = try(module.projects[each.value.host_project].project_id, each.value.host_project)
+  service_project_id = try(module.projects[each.value.service_project].project_id, each.value.service_project)
+
+  subnetwork   = lookup(each.value, "subnetwork", "")
+  region       = lookup(each.value, "region", "")
+  subnet_users = lookup(each.value, "users", [])
+
+  depends_on = [module.vpcs, module.projects]
+}
