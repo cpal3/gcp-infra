@@ -7,6 +7,21 @@ folders:
   - common
   - bootstrap
 
+logging:
+  project: logging
+  log_bucket_id: org-central-logs
+  retention_days: 30
+  sink_name: org-central-sink
+  filter: ""                          # empty = all logs (admin activity, system events, etc.)
+
+  gcs:
+    location: asia-south1
+    retention_days: 365               # 1-year archive for compliance
+
+# bigquery:                           # Reserved for future log analytics
+#   dataset_id: org_logs
+#   location: asia-south1
+
 projects:
   hub-net:
     folder: common

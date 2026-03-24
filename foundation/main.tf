@@ -87,31 +87,80 @@ resource "google_organization_policy" "org_policies" {
   }
 }
 
-# --- CENTRALIZED LOGGING (ORG LEVEL) ---
+# --- CENTRALIZED LOGGING ---
 
-# 1. Create a Log Bucket in the Logging Project
-resource "google_logging_project_bucket_config" "org_log_bucket" {
-  project        = module.projects["logging"].project_id
-  location       = "global"
-  retention_days = 30
-  bucket_id      = "org-central-logs"
+locals {
+  log_cfg = lookup(local.config, "logging", {})
 }
 
-# 2. Create the Org-level Log Sink
+# 1. Log Bucket in the Logging Project (hot storage, queryable in Log Explorer)
+resource "google_logging_project_bucket_config" "org_log_bucket" {
+  project        = module.projects[local.log_cfg.project].project_id
+  location       = "global"
+  retention_days = local.log_cfg.retention_days
+  bucket_id      = local.log_cfg.log_bucket_id
+}
+
+# 2. Org-level Sink → Log Bucket
 resource "google_logging_organization_sink" "org_sink" {
-  name             = "org-central-sink"
-  description      = "Centralized sink for all organization logs"
+  name             = local.log_cfg.sink_name
+  description      = "Centralized org sink — all logs to log bucket"
   org_id           = var.org_id
   destination      = "logging.googleapis.com/${google_logging_project_bucket_config.org_log_bucket.id}"
+  filter           = local.log_cfg.filter
   include_children = true
 }
 
-# 3. Grant the Sink's Service Account permission to write to the Logging Project
+# 3. Grant Sink SA permission to write to Log Bucket
 resource "google_project_iam_member" "log_sink_member" {
-  project = module.projects["logging"].project_id
+  project = module.projects[local.log_cfg.project].project_id
   role    = "roles/logging.bucketWriter"
   member  = google_logging_organization_sink.org_sink.writer_identity
 }
+
+# 4. GCS Archive Bucket (long-term retention / compliance)
+resource "google_storage_bucket" "log_archive" {
+  name          = "${module.projects[local.log_cfg.project].project_id}-log-archive"
+  project       = module.projects[local.log_cfg.project].project_id
+  location      = local.log_cfg.gcs.location
+  force_destroy = false
+
+  retention_policy {
+    retention_period = local.log_cfg.gcs.retention_days * 86400  # days → seconds
+  }
+
+  lifecycle_rule {
+    condition { age = 90 }
+    action    { type = "SetStorageClass"; storage_class = "NEARLINE" }
+  }
+
+  lifecycle_rule {
+    condition { age = 365 }
+    action    { type = "SetStorageClass"; storage_class = "COLDLINE" }
+  }
+}
+
+# 5. Org-level Sink → GCS Archive
+resource "google_logging_organization_sink" "org_sink_gcs" {
+  name             = "${local.log_cfg.sink_name}-gcs"
+  description      = "Centralized org sink — all logs to GCS archive"
+  org_id           = var.org_id
+  destination      = "storage.googleapis.com/${google_storage_bucket.log_archive.name}"
+  filter           = local.log_cfg.filter
+  include_children = true
+}
+
+# 6. Grant GCS Sink SA permission to write to archive bucket
+resource "google_storage_bucket_iam_member" "log_archive_sink_member" {
+  bucket = google_storage_bucket.log_archive.name
+  role   = "roles/storage.objectCreator"
+  member = google_logging_organization_sink.org_sink_gcs.writer_identity
+}
+
+# BigQuery sink — reserved for future log analytics
+# resource "google_bigquery_dataset" "org_logs" { ... }
+# resource "google_logging_organization_sink" "org_sink_bq" { ... }
+
 
 # --- VPC NETWORKS ---
 
