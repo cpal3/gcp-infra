@@ -63,6 +63,23 @@ vpcs:
       - name: hub-subnet-asia-south1
         cidr: 10.1.0.0/22
         region: asia-south1
+    firewall_rules:
+      - name: deny-all-ingress
+        direction: INGRESS
+        priority: 65534
+        deny:
+          - protocol: all
+        source_ranges:
+          - "0.0.0.0/0"
+      # allow-iap-ssh intentionally omitted: hub hosts Palo Alto NVA (managed via Panorama/HTTPS)
+      # and DNS peering only. PA-specific management rules will be added at NVA deployment time.
+      - name: allow-internal
+        direction: INGRESS
+        priority: 1000
+        allow:
+          - protocol: all
+        source_ranges:
+          - "10.1.0.0/22"       # hub-vpc primary range
 
 #  prod-vpc:
 #    project: prod-host1
@@ -78,6 +95,31 @@ vpcs:
 #            cidr: 10.1.72.0/21
 #          - name: gke-services
 #            cidr: 10.1.65.0/25
+#    firewall_rules:
+#      - name: deny-all-ingress
+#        direction: INGRESS
+#        priority: 65534
+#        deny:
+#          - protocol: all
+#        source_ranges:
+#          - "0.0.0.0/0"
+#      - name: allow-iap-ssh
+#        direction: INGRESS
+#        priority: 1000
+#        allow:
+#          - protocol: tcp
+#            ports: ["22"]
+#        source_ranges:
+#          - "35.235.240.0/20"
+#        target_tags:
+#          - iap-ssh
+#      - name: allow-internal
+#        direction: INGRESS
+#        priority: 1000
+#        allow:
+#          - protocol: all
+#        source_ranges:
+#          - "10.1.64.0/24"
 
   nonprod-vpc:
     project: nonprod-host
@@ -96,6 +138,32 @@ vpcs:
       - name: test-subnet-asia-south1
         cidr: 10.1.144.0/24
         region: asia-south1
+    firewall_rules:
+      - name: deny-all-ingress
+        direction: INGRESS
+        priority: 65534
+        deny:
+          - protocol: all
+        source_ranges:
+          - "0.0.0.0/0"
+      - name: allow-iap-ssh
+        direction: INGRESS
+        priority: 1000
+        allow:
+          - protocol: tcp
+            ports: ["22"]
+        source_ranges:
+          - "35.235.240.0/20"   # GCP Identity-Aware Proxy range
+        target_tags:
+          - iap-ssh
+      - name: allow-internal
+        direction: INGRESS
+        priority: 1000
+        allow:
+          - protocol: all
+        source_ranges:
+          - "10.1.128.0/24"     # nonprod primary subnet
+          - "10.1.144.0/24"     # test subnet
 
 # VPC Peering (Hub-and-Spoke)
 peerings:

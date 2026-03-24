@@ -156,6 +156,50 @@ resource "google_compute_network_peering" "peerings_reverse" {
   depends_on = [module.vpcs]
 }
 
+# --- FIREWALL RULES ---
+
+locals {
+  # Flatten vpc -> firewall_rules into a map keyed by "vpc_name-rule_name"
+  firewall_rules = merge([
+    for vpc_name, vpc in lookup(local.config, "vpcs", {}) : {
+      for rule in lookup(vpc, "firewall_rules", []) :
+      "${vpc_name}-${rule.name}" => merge(rule, {
+        vpc_name   = vpc_name
+        project_id = module.projects[vpc.project].project_id
+      })
+    }
+  ]...)
+}
+
+resource "google_compute_firewall" "rules" {
+  for_each = local.firewall_rules
+
+  name        = each.value.name
+  network     = module.vpcs[each.value.vpc_name].network_self_link
+  project     = each.value.project_id
+  direction   = each.value.direction
+  priority    = each.value.priority
+  source_ranges = lookup(each.value, "source_ranges", [])
+  target_tags   = lookup(each.value, "target_tags", null)
+
+  dynamic "allow" {
+    for_each = lookup(each.value, "allow", [])
+    content {
+      protocol = allow.value.protocol
+      ports    = lookup(allow.value, "ports", [])
+    }
+  }
+
+  dynamic "deny" {
+    for_each = lookup(each.value, "deny", [])
+    content {
+      protocol = deny.value.protocol
+    }
+  }
+
+  depends_on = [module.vpcs]
+}
+
 # --- SERVICE ACCOUNTS ---
 
 resource "google_service_account" "service_accounts" {
