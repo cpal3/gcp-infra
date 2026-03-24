@@ -14,21 +14,21 @@ vpcs:
         region: asia-south1
         private_google_access: true
 
-  prod-vpc:
-    project: prod-host1
-    routing_mode: REGIONAL
-    enable_shared_vpc_host: true  # Enable Shared VPC for service projects
-    enable_flow_logs: true
-    subnets:
-      - name: prod-subnet-asia-south1
-        cidr: 10.1.0.0/24
-        region: asia-south1
-        private_google_access: true
-        secondary_ranges:
-          - name: gke-pods
-            cidr: 10.10.0.0/16
-          - name: gke-services
-            cidr: 10.11.0.0/20
+#  prod-vpc:                         # Uncomment when prod-host1 is created in foundation
+#    project: prod-host1
+#    routing_mode: REGIONAL
+#    enable_shared_vpc_host: true
+#    enable_flow_logs: true
+#    subnets:
+#      - name: prod-subnet-asia-south1
+#        cidr: 10.1.0.0/24
+#        region: asia-south1
+#        private_google_access: true
+#        secondary_ranges:
+#          - name: gke-pods
+#            cidr: 10.10.0.0/16
+#          - name: gke-services
+#            cidr: 10.11.0.0/20
 
   nonprod-vpc:
     project: nonprod-host
@@ -48,11 +48,11 @@ vpcs:
 
 # VPC Peering (Hub-and-Spoke)
 peerings:
-  - name: hub-to-prod
-    network: hub-vpc
-    peer_network: prod-vpc
-    export_custom_routes: true
-    import_custom_routes: true
+#  - name: hub-to-prod              # Uncomment when prod-vpc is activated
+#    network: hub-vpc
+#    peer_network: prod-vpc
+#    export_custom_routes: true
+#    import_custom_routes: true
   
   - name: hub-to-nonprod
     network: hub-vpc
