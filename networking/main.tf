@@ -14,7 +14,7 @@ provider "google" {
 
 locals {
   config = yamldecode(file("${path.module}/config.yaml"))
-  
+
   # Extract project IDs from foundation outputs
   # We'll use data sources to reference existing projects
 }
@@ -33,12 +33,12 @@ module "vpcs" {
   source   = "../modules/network"
   for_each = local.config.vpcs
 
-  project_id              = data.terraform_remote_state.foundation.outputs.project_ids[each.value.project]
-  network_name            = each.key
-  routing_mode            = each.value.routing_mode
-  enable_shared_vpc_host  = each.value.enable_shared_vpc_host
-  enable_flow_logs        = each.value.enable_flow_logs
-  subnets                 = each.value.subnets
+  project_id             = data.terraform_remote_state.foundation.outputs.project_ids[each.value.project]
+  network_name           = each.key
+  routing_mode           = each.value.routing_mode
+  enable_shared_vpc_host = each.value.enable_shared_vpc_host
+  enable_flow_logs       = each.value.enable_flow_logs
+  subnets                = each.value.subnets
 }
 
 # VPC Peering Connections

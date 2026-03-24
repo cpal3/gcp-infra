@@ -42,14 +42,14 @@ module "projects" {
   source   = "../modules/project"
   for_each = local.config.projects
 
-  name              = each.key
-  project_id_prefix = var.project_id_prefix
-  project_id        = lookup(each.value, "project_id", null)
-  folder_id         = module.folders.ids[each.value.folder]
-  billing_account   = var.billing_account
-  environment       = each.value.environment
-  labels            = local.common_labels
-  apis              = each.value.apis
+  name                = each.key
+  project_id_prefix   = var.project_id_prefix
+  project_id          = lookup(each.value, "project_id", null)
+  folder_id           = module.folders.ids[each.value.folder]
+  billing_account     = var.billing_account
+  environment         = each.value.environment
+  labels              = local.common_labels
+  apis                = each.value.apis
   deletion_protection = var.deletion_protection
 }
 
@@ -126,17 +126,23 @@ resource "google_storage_bucket" "log_archive" {
   force_destroy = false
 
   retention_policy {
-    retention_period = local.log_cfg.gcs.retention_days * 86400  # days → seconds
+    retention_period = local.log_cfg.gcs.retention_days * 86400 # days → seconds
   }
 
   lifecycle_rule {
     condition { age = 90 }
-    action    { type = "SetStorageClass"; storage_class = "NEARLINE" }
+    action {
+      type          = "SetStorageClass"
+      storage_class = "NEARLINE"
+    }
   }
 
   lifecycle_rule {
     condition { age = 365 }
-    action    { type = "SetStorageClass"; storage_class = "COLDLINE" }
+    action {
+      type          = "SetStorageClass"
+      storage_class = "COLDLINE"
+    }
   }
 }
 
@@ -168,12 +174,12 @@ module "vpcs" {
   source   = "../modules/network"
   for_each = lookup(local.config, "vpcs", {})
 
-  project_id              = module.projects[each.value.project].project_id
-  network_name            = each.key
-  routing_mode            = each.value.routing_mode
-  enable_shared_vpc_host  = each.value.enable_shared_vpc_host
-  enable_flow_logs        = each.value.enable_flow_logs
-  subnets                 = each.value.subnets
+  project_id             = module.projects[each.value.project].project_id
+  network_name           = each.key
+  routing_mode           = each.value.routing_mode
+  enable_shared_vpc_host = each.value.enable_shared_vpc_host
+  enable_flow_logs       = each.value.enable_flow_logs
+  subnets                = each.value.subnets
 
   depends_on = [module.projects]
 }
@@ -223,11 +229,11 @@ locals {
 resource "google_compute_firewall" "rules" {
   for_each = local.firewall_rules
 
-  name        = each.value.name
-  network     = module.vpcs[each.value.vpc_name].network_self_link
-  project     = each.value.project_id
-  direction   = each.value.direction
-  priority    = each.value.priority
+  name          = each.value.name
+  network       = module.vpcs[each.value.vpc_name].network_self_link
+  project       = each.value.project_id
+  direction     = each.value.direction
+  priority      = each.value.priority
   source_ranges = lookup(each.value, "source_ranges", [])
   target_tags   = lookup(each.value, "target_tags", null)
 

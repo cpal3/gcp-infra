@@ -29,10 +29,10 @@ variable "enable_flow_logs" {
 variable "subnets" {
   description = "List of subnets to create."
   type = list(object({
-    name                   = string
-    cidr                   = string
-    region                 = string
-    private_google_access  = optional(bool, true)
-    secondary_ranges       = optional(list(object({ name = string, cidr = string })), [])
+    name                  = string
+    cidr                  = string
+    region                = string
+    private_google_access = optional(bool, true)
+    secondary_ranges      = optional(list(object({ name = string, cidr = string })), [])
   }))
 }

@@ -13,7 +13,7 @@ resource "google_project" "seed_project" {
   billing_account = var.billing_account
   folder_id       = var.folder_id != "" ? var.folder_id : null
   org_id          = var.folder_id == "" ? var.org_id : null
-  
+
   # Prevent accidental deletion of the seed project
   lifecycle {
     prevent_destroy = true
@@ -21,8 +21,8 @@ resource "google_project" "seed_project" {
 }
 
 resource "google_project_service" "apis" {
-  project = google_project.seed_project.project_id
-  service = "cloudresourcemanager.googleapis.com"
+  project            = google_project.seed_project.project_id
+  service            = "cloudresourcemanager.googleapis.com"
   disable_on_destroy = false
 }
 
@@ -36,9 +36,9 @@ resource "google_project_service" "additional_apis" {
     "logging.googleapis.com",
     "iamcredentials.googleapis.com" # Required for WIF
   ])
-  service = each.key
+  service            = each.key
   disable_on_destroy = false
-  depends_on = [google_project_service.apis]
+  depends_on         = [google_project_service.apis]
 }
 
 # --- TERRAFORM STATE BUCKET ---

@@ -33,25 +33,8 @@ resource "google_compute_subnetwork" "subnets" {
   }
 }
 
-resource "google_compute_firewall" "allow_internal" {
-  name    = "${var.network_name}-allow-internal"
-  network = google_compute_network.vpc.name
-  project = var.project_id
-
-  allow {
-    protocol = "icmp"
-  }
-  allow {
-    protocol = "tcp"
-    ports    = ["0-65535"]
-  }
-  allow {
-    protocol = "udp"
-    ports    = ["0-65535"]
-  }
-
-  source_ranges = [for s in var.subnets : s.cidr]
-}
+# Firewall rules are managed by the foundation layer via config.yaml
+# (google_compute_firewall.rules in foundation/main.tf)
 
 # Enable Shared VPC if requested
 resource "google_compute_shared_vpc_host_project" "host" {
