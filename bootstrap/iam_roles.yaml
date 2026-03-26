@@ -36,6 +36,7 @@ iam_roles:
       - roles/compute.networkAdmin
       - roles/compute.securityAdmin
       - roles/storage.admin
+      - roles/container.admin
     project:
       - roles/storage.admin
       - roles/browser
