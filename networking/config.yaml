@@ -39,22 +39,16 @@ vpcs:
     enable_shared_vpc_host: true
     enable_flow_logs: true
     subnets:
-      # General-purpose nonprod subnet
+      # General-purpose nonprod subnet — also used by GKE (already has pod/service ranges in GCP)
       - name: nonprod-subnet-asia-south1
         cidr: 10.2.0.0/24
         region: asia-south1
         private_google_access: true
-
-      # Dedicated GKE subnet (private nodes + private endpoint)
-      # - name: nonprod-gke-subnet-asia-south1
-      #   cidr: 10.2.16.0/20          # 4096 addresses for nodes
-      #   region: asia-south1
-      #   private_google_access: true  # Required for private GKE nodes
-      #   secondary_ranges:
-      #     - name: gke-pods           # Alias used in ip_range_pods in infra-pipeline config
-      #       cidr: 10.20.0.0/16      # /16 = 65536 pod IPs (supports large clusters)
-      #     - name: gke-services       # Alias used in ip_range_services in infra-pipeline config
-      #       cidr: 10.21.0.0/20      # /20 = 4096 service IPs
+        secondary_ranges:
+          - name: gke-pods        # Existing secondary range — used by ip_range_pods in infra-pipeline
+            cidr: 10.20.0.0/16
+          - name: gke-services    # Existing secondary range — used by ip_range_services in infra-pipeline
+            cidr: 10.21.0.0/20
 
 peerings:
 #   - name: hub-to-prod

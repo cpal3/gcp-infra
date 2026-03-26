@@ -11,9 +11,9 @@ projects:
       owner: "app-team"
 
     ## Shared VPC host project is ingr-nonprod-host
-    ## Dedicated GKE subnet with secondary ranges for pods/services
+    ## nonprod-subnet-asia-south1 already has gke-pods & gke-services secondary ranges in GCP
     network_id: "projects/ingr-nonprod-host/global/networks/nonprod-vpc"
-    subnetwork_id: "projects/ingr-nonprod-host/regions/asia-south1/subnetworks/nonprod-gke-subnet-asia-south1"
+    subnetwork_id: "projects/ingr-nonprod-host/regions/asia-south1/subnetworks/nonprod-subnet-asia-south1"
 
     gke:
       enabled: true
