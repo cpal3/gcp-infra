@@ -3,7 +3,7 @@ projects:
   ## nonprod app project — uses shared nonprod-vpc from host project
   ## ----------------------------------------------------------------
   my-app-project:
-    project_id: "ingr-my-app-db"
+    project_id: "ingr-app-backend-nonprod"
     region: "asia-south1"
     labels:
       environment: "nonprod"

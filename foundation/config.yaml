@@ -63,6 +63,7 @@ projects:
     business_unit: "human-resources"
     apis:
       - compute.googleapis.com
+      - container.googleapis.com
 
 org_policies:
   - constraint: constraints/iam.disableServiceAccountKeyCreation

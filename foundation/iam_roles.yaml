@@ -13,7 +13,6 @@ project_iam_bindings:
     roles:
       - roles/compute.instanceAdmin.v1
       - roles/run.admin
-      - roles/container.admin
     members:
       - "serviceAccount:app-sa@ingr-app-backend-nonprod.iam.gserviceaccount.com"
 
