@@ -1,0 +1,43 @@
+# Terraform Networking Workflow
+# Manages the network infrastructure (VPCs, Subnets, Peering, Shared VPC)
+
+name: "Terraform Networking"
+
+concurrency:
+  group: terraform-deployment
+  cancel-in-progress: false
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'networking/**'
+      - 'modules/network/**'
+      - '.github/workflows/**'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'networking/**'
+      - 'modules/network/**'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+jobs:
+  networking:
+    name: "Networking"
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+    uses: ./.github/workflows/terraform-module.yaml
+    with:
+      directory: 'networking'
+      environment: 'networking'
+      service_account: 'foundation-runner@ingr-seed-project.iam.gserviceaccount.com'
+    secrets:
+      ORG_ID: ${{ secrets.TF_VAR_ORG_ID }}
+      BILLING_ACCOUNT: ${{ secrets.TF_VAR_BILLING_ACCOUNT }}
+      PROJECT_NAME: ${{ secrets.TF_VAR_PROJECT_NAME }}
+      REGION: ${{ secrets.TF_VAR_REGION }}
+      GITHUB_REPO: ${{ secrets.TF_VAR_GITHUB_REPO }}
