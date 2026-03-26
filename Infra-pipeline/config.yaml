@@ -1,0 +1,61 @@
+projects:
+  ## ----------------------------------------------------------------
+  ## nonprod app project — uses shared nonprod-vpc from host project
+  ## ----------------------------------------------------------------
+  my-app-project:
+    project_id: "ingr-my-app-db"
+    region: "asia-south1"
+    labels:
+      environment: "nonprod"
+      cost_center: "1234"
+      owner: "app-team"
+
+    ## Shared VPC host project is ingr-nonprod-host
+    ## Dedicated GKE subnet with secondary ranges for pods/services
+    network_id: "projects/ingr-nonprod-host/global/networks/nonprod-vpc"
+    subnetwork_id: "projects/ingr-nonprod-host/regions/asia-south1/subnetworks/nonprod-gke-subnet-asia-south1"
+
+    gke:
+      enabled: true
+      cluster_name: "gke-private-nonprod"
+      node_count: 1
+      machine_type: "e2-standard-4"
+      ## /28 = 16 IPs; master control-plane endpoint (must not overlap anything)
+      master_ipv4_cidr_block: "172.16.0.0/28"
+      ## Must match the secondary_range names in networking/config.yaml
+      ip_range_pods: "gke-pods"
+      ip_range_services: "gke-services"
+
+    cloud_sql:
+      enabled: false        # Enable when DB is needed for this project
+      instance_name: "sql-private-nonprod"
+      database_version: "POSTGRES_15"
+      tier: "db-custom-2-3840"
+      allocated_ip_range: "google-managed-services-nonprod-vpc"  # PSA range name
+
+    cloud_run:
+      enabled: false
+
+    load_balancer:
+      enabled: false
+
+  ## ----------------------------------------------------------------
+  ## Template for another project (uncomment and fill in to onboard)
+  ## ----------------------------------------------------------------
+  # another-project:
+  #   project_id: "ingr-<project-id>"
+  #   region: "asia-south1"
+  #   labels:
+  #     environment: "nonprod"
+  #     cost_center: "<cost-center>"
+  #     owner: "<team>"
+  #   network_id: "projects/<HOST_PROJECT_ID>/global/networks/<VPC_NAME>"
+  #   subnetwork_id: "projects/<HOST_PROJECT_ID>/regions/asia-south1/subnetworks/<SUBNET_NAME>"
+  #   gke:
+  #     enabled: false
+  #   cloud_sql:
+  #     enabled: false
+  #   cloud_run:
+  #     enabled: false
+  #   load_balancer:
+  #     enabled: false

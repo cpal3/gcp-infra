@@ -6,62 +6,81 @@ terraform {
 }
 
 provider "google" {
-  region = "asia-south1" # Note: Change to your default region
+  region = "asia-south1"
 }
 
-# ---------------------------------------------------------
-# Data Sources from Foundation and Networking layers
-# ---------------------------------------------------------
-
-data "terraform_remote_state" "foundation" {
-  backend = "gcs"
-  config = {
-    bucket = "ingr-seed-project-tfstate"
-    prefix = "terraform/foundation"
-  }
+locals {
+  # Parse config.yaml safely
+  raw_config = yamldecode(file("${path.module}/config.yaml"))
+  
+  # Ensure projects map exists
+  projects = try(local.raw_config.projects, {})
 }
 
-data "terraform_remote_state" "networking" {
-  backend = "gcs"
-  config = {
-    bucket = "ingr-seed-project-tfstate"
-    prefix = "terraform/networking"
-  }
+# =========================================================
+# GKE Modules
+# =========================================================
+module "gke" {
+  source   = "../modules/gke"
+  for_each = { for k, v in local.projects : k => v if try(v.gke.enabled, false) }
+
+  project_id             = each.value.project_id
+  region                 = each.value.region
+  cluster_name           = each.value.gke.cluster_name
+  network_id             = each.value.network_id
+  subnetwork_id          = each.value.subnetwork_id
+  node_count             = try(each.value.gke.node_count, 1)
+  machine_type           = try(each.value.gke.machine_type, "e2-medium")
+  master_ipv4_cidr_block = each.value.gke.master_ipv4_cidr_block
+  ip_range_pods          = each.value.gke.ip_range_pods
+  ip_range_services      = each.value.gke.ip_range_services
+  labels                 = try(each.value.labels, {})
 }
 
-# ---------------------------------------------------------
-# Example: Creating a new Service Project
-# ---------------------------------------------------------
+# =========================================================
+# Cloud SQL Modules
+# =========================================================
+module "cloud_sql" {
+  source   = "../modules/cloud_sql"
+  for_each = { for k, v in local.projects : k => v if try(v.cloud_sql.enabled, false) }
 
-# module "app_project" {
-#   source = "../modules/project"
-#
-#   name                = "my-app-db"
-#   project_id_prefix   = "ingr"
-#   folder_id           = data.terraform_remote_state.foundation.outputs.folder_ids["prod"]
-#   billing_account     = "YOUR_BILLING_ACCOUNT_ID" 
-#   environment         = "prod"
-#   labels              = { cost_center = "web", owner = "team-a" }
-#   apis                = ["compute.googleapis.com"]
-# }
+  project_id         = each.value.project_id
+  region             = each.value.region
+  instance_name      = each.value.cloud_sql.instance_name
+  database_version   = try(each.value.cloud_sql.database_version, "POSTGRES_15")
+  tier               = try(each.value.cloud_sql.tier, "db-f1-micro")
+  network_id         = each.value.network_id
+  allocated_ip_range = try(each.value.cloud_sql.allocated_ip_range, null)
+  labels             = try(each.value.labels, {})
+}
 
-# ---------------------------------------------------------
-# Example: Attaching the Service Project to the Shared VPC
-# ---------------------------------------------------------
+# =========================================================
+# Cloud Run Modules
+# =========================================================
+module "cloud_run" {
+  source   = "../modules/cloud_run"
+  for_each = { for k, v in local.projects : k => v if try(v.cloud_run.enabled, false) }
 
-# module "app_project_attachment" {
-#   source = "../modules/project_attachment"
-#
-#   # The Host Project created in the Networking/Foundation layer
-#   host_project_id    = data.terraform_remote_state.foundation.outputs.project_ids["prod-host1"]
-#   
-#   # The newly created Service Project above
-#   service_project_id = module.app_project.project_id
-#
-#   # (Optional) Granting users NetworkUser on a specific subnet
-#   subnetwork         = "prod-subnet-asia-south1"
-#   region             = "asia-south1"
-#   subnet_users       = [
-#     "serviceAccount:my-sa@my-app-db.iam.gserviceaccount.com"
-#   ]
-# }
+  project_id    = each.value.project_id
+  region        = each.value.region
+  service_name  = each.value.cloud_run.service_name
+  image         = try(each.value.cloud_run.image, "us-docker.pkg.dev/cloudrun/container/hello")
+  network_id    = each.value.network_id
+  subnetwork_id = each.value.subnetwork_id
+  labels        = try(each.value.labels, {})
+}
+
+# =========================================================
+# Internal Load Balancer Modules
+# =========================================================
+module "load_balancer" {
+  source   = "../modules/load_balancer"
+  for_each = { for k, v in local.projects : k => v if try(v.load_balancer.enabled, false) }
+
+  project_id    = each.value.project_id
+  region        = each.value.region
+  lb_name       = each.value.load_balancer.lb_name
+  network_id    = each.value.network_id
+  subnetwork_id = each.value.subnetwork_id
+  labels        = try(each.value.labels, {})
+}
