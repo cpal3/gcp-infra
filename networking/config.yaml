@@ -5,17 +5,17 @@
 # Do NOT apply this layer. Kept for reference only.
 # ============================================================
 
-# vpcs:
-#   hub-vpc:
-#     project: hub-net
-#     routing_mode: REGIONAL
-#     enable_shared_vpc_host: false
-#     enable_flow_logs: true
-#     subnets:
-#       - name: hub-subnet-asia-south1
-#         cidr: 10.0.0.0/24
-#         region: asia-south1
-#         private_google_access: true
+vpcs:
+  hub-vpc:
+    project: hub-net
+    routing_mode: REGIONAL
+    enable_shared_vpc_host: false
+    enable_flow_logs: true
+    subnets:
+      - name: hub-subnet-asia-south1
+        cidr: 10.0.0.0/24
+        region: asia-south1
+        private_google_access: true
 
 #   prod-vpc:                         # Uncomment in foundation when prod-host1 is created
 #     project: prod-host1
@@ -33,34 +33,34 @@
 #           - name: gke-services
 #             cidr: 10.11.0.0/20
 
-#   nonprod-vpc:
-#     project: nonprod-host
-#     routing_mode: REGIONAL
-#     enable_shared_vpc_host: true
-#     enable_flow_logs: true
-#     subnets:
-#       - name: nonprod-subnet-asia-south1
-#         cidr: 10.2.0.0/24
-#         region: asia-south1
-#         private_google_access: true
-#         secondary_ranges:
-#           - name: gke-pods
-#             cidr: 10.20.0.0/16
-#           - name: gke-services
-#             cidr: 10.21.0.0/20
+  nonprod-vpc:
+    project: nonprod-host
+    routing_mode: REGIONAL
+    enable_shared_vpc_host: true
+    enable_flow_logs: true
+    subnets:
+      - name: nonprod-subnet-asia-south1
+        cidr: 10.2.0.0/24
+        region: asia-south1
+        private_google_access: true
+        secondary_ranges:
+          - name: gke-pods
+            cidr: 10.20.0.0/16
+          - name: gke-services
+            cidr: 10.21.0.0/20
 
-# peerings:
+peerings:
 #   - name: hub-to-prod
 #     network: hub-vpc
 #     peer_network: prod-vpc
 #     export_custom_routes: true
 #     import_custom_routes: true
 #
-#   - name: hub-to-nonprod
-#     network: hub-vpc
-#     peer_network: nonprod-vpc
-#     export_custom_routes: true
-#     import_custom_routes: true
+  - name: hub-to-nonprod
+    network: hub-vpc
+    peer_network: nonprod-vpc
+    export_custom_routes: true
+    import_custom_routes: true
 
-vpcs: {}
-peerings: []
+# vpcs: {}
+# peerings: []
