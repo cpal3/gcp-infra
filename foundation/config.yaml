@@ -26,6 +26,8 @@ projects:
   hub-net:
     folder: common
     environment: common
+    cost_center: "1001-IT"
+    business_unit: "platform-engineering"
     apis:
       - compute.googleapis.com
       - servicenetworking.googleapis.com
@@ -33,6 +35,8 @@ projects:
   logging:
     folder: common
     environment: common
+    cost_center: "1001-IT"
+    business_unit: "platform-engineering"
     apis:
       - logging.googleapis.com
       - bigquery.googleapis.com
@@ -46,12 +50,16 @@ projects:
   nonprod-host:
     folder: non-prod
     environment: non-prod
+    cost_center: "1001-IT"
+    business_unit: "platform-engineering"
     apis:
       - compute.googleapis.com
       - container.googleapis.com
   app-backend-nonprod:
     folder: non-prod
     environment: non-prod
+    cost_center: "2045-HR"
+    business_unit: "human-resources"
     apis:
       - compute.googleapis.com
 

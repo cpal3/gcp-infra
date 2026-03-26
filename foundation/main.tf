@@ -48,7 +48,11 @@ module "projects" {
   folder_id           = module.folders.ids[each.value.folder]
   billing_account     = var.billing_account
   environment         = each.value.environment
-  labels              = local.common_labels
+  labels              = {
+    cost_center   = each.value.cost_center
+    business_unit = each.value.business_unit
+    owner         = var.owner
+  }
   apis                = each.value.apis
   deletion_protection = var.deletion_protection
 }

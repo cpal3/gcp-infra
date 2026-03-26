@@ -28,11 +28,11 @@ variable "environment" {
 }
 
 variable "labels" {
-  description = "Map of labels to apply to the project. Must include cost_center and owner."
+  description = "Map of labels to apply to the project. Must include cost_center, owner, and business_unit."
   type        = map(string)
   validation {
-    condition     = can(var.labels["cost_center"]) && can(var.labels["owner"])
-    error_message = "Labels must contain 'cost_center' and 'owner'."
+    condition     = can(var.labels["cost_center"]) && can(var.labels["owner"]) && can(var.labels["business_unit"])
+    error_message = "Labels must contain 'cost_center', 'owner', and 'business_unit'."
   }
 }
 
