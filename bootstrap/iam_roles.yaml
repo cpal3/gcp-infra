@@ -33,6 +33,7 @@ iam_roles:
       - roles/billing.user
       - roles/compute.xpnAdmin
       - roles/compute.networkAdmin
+      - roles/compute.securityAdmin
     project:
       - roles/storage.admin
       - roles/browser

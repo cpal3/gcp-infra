@@ -124,6 +124,7 @@ resource "google_storage_bucket" "log_archive" {
   project       = module.projects[local.log_cfg.project].project_id
   location      = local.log_cfg.gcs.location
   force_destroy = false
+  labels        = local.common_labels
 
   retention_policy {
     retention_period = local.log_cfg.gcs.retention_days * 86400 # days → seconds

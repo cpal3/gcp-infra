@@ -24,3 +24,12 @@ subnetwork_iam_bindings:
       - roles/compute.networkUser
     members:
       - "serviceAccount:app-sa@ingr-app-backend-nonprod.iam.gserviceaccount.com"
+  - project: nonprod-host1
+    region: asia-south2
+    subnetwork: nonprod-subnet-asia-south1
+    roles:
+      - roles/compute.networkUser
+      - roles/compute.networkUser
+      - roles/compute.networkUser
+    members:
+      - "serviceAccount:app-sa@ingr-app-backend-nonprod.iam.gservice
