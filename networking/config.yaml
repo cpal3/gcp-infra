@@ -46,15 +46,15 @@ vpcs:
         private_google_access: true
 
       # Dedicated GKE subnet (private nodes + private endpoint)
-      - name: nonprod-gke-subnet-asia-south1
-        cidr: 10.2.16.0/20          # 4096 addresses for nodes
-        region: asia-south1
-        private_google_access: true  # Required for private GKE nodes
-        secondary_ranges:
-          - name: gke-pods           # Alias used in ip_range_pods in infra-pipeline config
-            cidr: 10.20.0.0/16      # /16 = 65536 pod IPs (supports large clusters)
-          - name: gke-services       # Alias used in ip_range_services in infra-pipeline config
-            cidr: 10.21.0.0/20      # /20 = 4096 service IPs
+      # - name: nonprod-gke-subnet-asia-south1
+      #   cidr: 10.2.16.0/20          # 4096 addresses for nodes
+      #   region: asia-south1
+      #   private_google_access: true  # Required for private GKE nodes
+      #   secondary_ranges:
+      #     - name: gke-pods           # Alias used in ip_range_pods in infra-pipeline config
+      #       cidr: 10.20.0.0/16      # /16 = 65536 pod IPs (supports large clusters)
+      #     - name: gke-services       # Alias used in ip_range_services in infra-pipeline config
+      #       cidr: 10.21.0.0/20      # /20 = 4096 service IPs
 
 peerings:
 #   - name: hub-to-prod
