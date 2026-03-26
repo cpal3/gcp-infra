@@ -125,6 +125,7 @@ resource "google_storage_bucket" "log_archive" {
   location      = local.log_cfg.gcs.location
   force_destroy = false
   labels        = local.common_labels
+  uniform_bucket_level_access = true
 
   retention_policy {
     retention_period = local.log_cfg.gcs.retention_days * 86400 # days → seconds
