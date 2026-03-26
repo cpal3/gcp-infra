@@ -124,6 +124,7 @@ resource "google_project_iam_member" "log_sink_member" {
 
 # 4. GCS Archive Bucket (long-term retention / compliance)
 resource "google_storage_bucket" "log_archive" {
+  count         = lookup(try(local.log_cfg.gcs, {}), "enabled", true) ? 1 : 0
   name          = "${module.projects[local.log_cfg.project].project_id}-log-archive"
   project       = module.projects[local.log_cfg.project].project_id
   location      = local.log_cfg.gcs.location
@@ -154,19 +155,21 @@ resource "google_storage_bucket" "log_archive" {
 
 # 5. Org-level Sink → GCS Archive
 resource "google_logging_organization_sink" "org_sink_gcs" {
+  count            = lookup(try(local.log_cfg.gcs, {}), "enabled", true) ? 1 : 0
   name             = "${local.log_cfg.sink_name}-gcs"
   description      = "Centralized org sink — all logs to GCS archive"
   org_id           = var.org_id
-  destination      = "storage.googleapis.com/${google_storage_bucket.log_archive.name}"
+  destination      = "storage.googleapis.com/${google_storage_bucket.log_archive[0].name}"
   filter           = local.log_cfg.filter
   include_children = true
 }
 
 # 6. Grant GCS Sink SA permission to write to archive bucket
 resource "google_storage_bucket_iam_member" "log_archive_sink_member" {
-  bucket = google_storage_bucket.log_archive.name
+  count  = lookup(try(local.log_cfg.gcs, {}), "enabled", true) ? 1 : 0
+  bucket = google_storage_bucket.log_archive[0].name
   role   = "roles/storage.objectCreator"
-  member = google_logging_organization_sink.org_sink_gcs.writer_identity
+  member = google_logging_organization_sink.org_sink_gcs[0].writer_identity
 }
 
 # BigQuery sink — reserved for future log analytics

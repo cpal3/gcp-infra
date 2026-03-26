@@ -15,6 +15,7 @@ logging:
   filter: ""                          # empty = all logs (admin activity, system events, etc.)
 
   gcs:
+    enabled: false
     location: asia-south1
     retention_days: 365               # 1-year archive for compliance
 
