@@ -40,15 +40,14 @@ resource "google_container_cluster" "primary" {
     channel = var.release_channel
   }
 
-  # Security: Network Policy
+  # Security: Network Policy (Not required for Datapath V2 as it's built-in)
   network_policy {
-    enabled  = var.enable_network_policy
-    provider = "PROVIDER_UNSPECIFIED" # Datapath V2 handles this
+    enabled  = false
   }
 
   addons_config {
     network_policy_config {
-      disabled = !var.enable_network_policy
+      disabled = true
     }
   }
 
