@@ -56,6 +56,7 @@ projects:
     apis:
       - compute.googleapis.com
       - container.googleapis.com
+      - servicenetworking.googleapis.com
   app-backend-nonprod:
     folder: non-prod
     environment: non-prod
@@ -163,6 +164,10 @@ vpcs:
       - name: test-subnet-asia-south1
         cidr: 10.1.144.0/24
         region: asia-south1
+    private_service_access_configs:
+      - name: "google-managed-services-nonprod-vpc"
+        address: "10.1.152.0"
+        prefix_length: 21
     firewall_rules:
       - name: deny-all-ingress
         direction: INGRESS

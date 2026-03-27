@@ -189,6 +189,7 @@ module "vpcs" {
   enable_shared_vpc_host = each.value.enable_shared_vpc_host
   enable_flow_logs       = each.value.enable_flow_logs
   subnets                = each.value.subnets
+  private_service_access_configs = lookup(each.value, "private_service_access_configs", [])
 
   depends_on = [module.projects]
 }

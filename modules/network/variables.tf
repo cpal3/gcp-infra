@@ -36,3 +36,13 @@ variable "subnets" {
     secondary_ranges      = optional(list(object({ name = string, cidr = string })), [])
   }))
 }
+
+variable "private_service_access_configs" {
+  description = "List of private service access configurations (reserved IP ranges for Google services)."
+  type = list(object({
+    name          = string
+    address       = string
+    prefix_length = number
+  }))
+  default = []
+}

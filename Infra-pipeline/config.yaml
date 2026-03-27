@@ -17,7 +17,7 @@ projects:
 
     gke:
       enabled: false
-      cluster_name: "gke-private-nonprod"
+      cluster_name: "ingr-gke-private-nonprod"
       deletion_protection: false
       regional: false
       zones: ["asia-south1-a"]
@@ -39,8 +39,8 @@ projects:
       ip_range_services: "gke-services"
 
     cloud_sql:
-      enabled: false        # Enable when DB is needed for this project
-      instance_name: "sql-private-nonprod"
+      enabled: true        # Enable when DB is needed for this project
+      instance_name: "ingr-sql-private-nonprod"
       database_version: "POSTGRES_15"
       tier: "db-custom-2-3840"
       allocated_ip_range: "google-managed-services-nonprod-vpc"  # PSA range name
