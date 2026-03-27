@@ -13,15 +13,17 @@ on:
       - main
     paths:
       - 'Infra-pipeline/**'
-      - 'modules/**'
-      - '.github/workflows/**'
+      - 'modules/gke/**'
+      - 'common.auto.tfvars'
+      - 'provider_versions.tf'
   pull_request:
     branches:
       - main
     paths:
       - 'Infra-pipeline/**'
-      - 'modules/**'
-      - '.github/workflows/**'
+      - 'modules/gke/**'
+      - 'common.auto.tfvars'
+      - 'provider_versions.tf'
   workflow_dispatch:
 
 jobs:

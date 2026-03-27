@@ -14,14 +14,16 @@ on:
     paths:
       - 'networking/**'
       - 'modules/network/**'
-      - '.github/workflows/**'
+      - 'common.auto.tfvars'
+      - 'provider_versions.tf'
   pull_request:
     branches:
       - main
     paths:
       - 'networking/**'
       - 'modules/network/**'
-      - '.github/workflows/**'
+      - 'common.auto.tfvars'
+      - 'provider_versions.tf'
   workflow_dispatch:
 
 jobs:

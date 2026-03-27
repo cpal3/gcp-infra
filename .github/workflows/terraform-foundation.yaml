@@ -13,15 +13,23 @@ on:
       - main
     paths:
       - 'foundation/**'
-      - 'modules/**'
-      - '.github/workflows/**'
+      - 'modules/folder/**'
+      - 'modules/project/**'
+      - 'modules/project_attachment/**'
+      - 'modules/network/**'
+      - 'common.auto.tfvars'
+      - 'provider_versions.tf'
   pull_request:
     branches:
       - main
     paths:
       - 'foundation/**'
-      - 'modules/**'
-      - '.github/workflows/**'
+      - 'modules/folder/**'
+      - 'modules/project/**'
+      - 'modules/project_attachment/**'
+      - 'modules/network/**'
+      - 'common.auto.tfvars'
+      - 'provider_versions.tf'
   workflow_dispatch:
 
 jobs:
