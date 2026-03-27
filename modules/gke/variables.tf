@@ -65,6 +65,12 @@ variable "enable_nap" {
   default     = true
 }
 
+variable "enable_network_policy" {
+  description = "Whether to enable GKE network policy."
+  type        = bool
+  default     = true
+}
+
 variable "enable_private_endpoint" {
   description = "Whether to disable the public endpoint of the cluster."
   type        = bool

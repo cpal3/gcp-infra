@@ -39,6 +39,7 @@ module "gke" {
   min_node_count         = try(each.value.gke.min_node_count, 1)
   max_node_count         = try(each.value.gke.max_node_count, 5)
   enable_nap             = try(each.value.gke.enable_nap, true)
+  enable_network_policy  = try(each.value.gke.enable_network_policy, true)
   release_channel        = try(each.value.gke.release_channel, "REGULAR")
   ip_range_pods          = each.value.gke.ip_range_pods
   ip_range_services      = each.value.gke.ip_range_services

@@ -1,3 +1,4 @@
+resource "google_container_cluster" "primary" {
   name     = var.cluster_name
   location = var.regional ? var.region : var.zones[0]
   project  = var.project_id
@@ -26,11 +27,6 @@
     master_ipv4_cidr_block  = var.master_ipv4_cidr_block
   }
 
-  # Security: Shielded Nodes
-  shielded_nodes {
-    enable_secure_boot          = true
-    enable_integrity_monitoring = true
-  }
 
   # Scalability: Vertical Pod Autoscaling
   vertical_pod_autoscaling {
@@ -44,13 +40,13 @@
 
   # Security: Network Policy
   network_policy {
-    enabled  = true
-    provider = "DATAPATH_PROVIDER_UNSPECIFIED" # Datapath V2 handles this
+    enabled  = var.enable_network_policy
+    provider = "PROVIDER_UNSPECIFIED" # Datapath V2 handles this
   }
 
   addons_config {
     network_policy_config {
-      disabled = false
+      disabled = !var.enable_network_policy
     }
   }
 
