@@ -3,6 +3,8 @@ resource "google_container_cluster" "primary" {
   location = var.regional ? var.region : var.zones[0]
   project  = var.project_id
 
+  deletion_protection = var.deletion_protection
+
   network    = var.network_id
   subnetwork = var.subnetwork_id
 

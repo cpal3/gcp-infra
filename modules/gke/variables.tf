@@ -98,6 +98,12 @@ variable "ip_range_services" {
   type        = string
 }
 
+variable "deletion_protection" {
+  description = "Whether to enable deletion protection for the cluster."
+  type        = bool
+  default     = false
+}
+
 variable "labels" {
   description = "A map of labels to apply to resources."
   type        = map(string)

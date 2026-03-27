@@ -27,6 +27,7 @@ module "gke" {
   project_id             = each.value.project_id
   region                 = each.value.region
   cluster_name           = each.value.gke.cluster_name
+  deletion_protection    = try(each.value.gke.deletion_protection, false)
   regional               = try(each.value.gke.regional, true)
   zones                  = try(each.value.gke.zones, [])
   network_id             = each.value.network_id

@@ -18,6 +18,7 @@ projects:
     gke:
       enabled: true
       cluster_name: "gke-private-nonprod"
+      deletion_protection: false
       regional: false
       zones: ["asia-south1-a"]
       node_count: 1
