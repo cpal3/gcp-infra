@@ -4,7 +4,7 @@
 name: "Terraform Networking"
 
 concurrency:
-  group: terraform-deployment
+  group: terraform-networking
   cancel-in-progress: false
 
 on:

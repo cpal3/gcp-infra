@@ -80,24 +80,24 @@ jobs:
               - 'modules/**'
 
       - name: Authenticate to Google Cloud
-        if: steps.changes.outputs.changed == 'true'
+        if: steps.changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         uses: google-github-actions/auth@v2
         with:
           workload_identity_provider: 'projects/671995239099/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
           service_account: ${{ inputs.service_account }}
 
       - name: Setup Terraform
-        if: steps.changes.outputs.changed == 'true'
+        if: steps.changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.11.0
 
       - name: Terraform Init
-        if: steps.changes.outputs.changed == 'true'
+        if: steps.changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         run: terraform init
 
       - name: Terraform Plan
-        if: steps.changes.outputs.changed == 'true'
+        if: steps.changes.outputs.changed == 'true' || github.event_name == 'workflow_dispatch'
         run: terraform plan -input=false
 
       - name: Terraform Apply

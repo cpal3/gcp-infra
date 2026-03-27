@@ -4,7 +4,7 @@
 name: "Terraform Foundation"
 
 concurrency:
-  group: terraform-deployment
+  group: terraform-foundation
   cancel-in-progress: false
 
 on:

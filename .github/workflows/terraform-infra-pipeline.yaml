@@ -1,10 +1,10 @@
-# Terraform Networking Workflow
-# Manages the network infrastructure (VPCs, Subnets, Peering, Shared VPC)
+# Terraform Infra-pipeline Workflow
+# Manages the GKE clusters and application infrastructure.
 
 name: "Terraform Infra-pipeline"
 
 concurrency:
-  group: terraform-deployment
+  group: terraform-infra-pipeline
   cancel-in-progress: false
 
 on:
