@@ -65,6 +65,7 @@ projects:
     apis:
       - compute.googleapis.com
       - container.googleapis.com
+      - sqladmin.googleapis.com
 
 org_policies:
   - constraint: constraints/iam.disableServiceAccountKeyCreation
