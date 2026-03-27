@@ -22,8 +22,8 @@ subnetwork_iam_bindings:
     subnetwork: nonprod-subnet-asia-south1
     roles:
       - roles/compute.networkUser
-    members:
-      - "serviceAccount:app-sa@ingr-app-backend-nonprod.iam.gserviceaccount.com"
+    members: 
+      - "serviceAccount:service-890886578244@compute-system.iam.gserviceaccount.com"
+      - "serviceAccount:service-890886578244@container-engine-robot.iam.gserviceaccount.com"
+      - "serviceAccount:890886578244@cloudservices.gserviceaccount.com"
       - "serviceAccount:terraform-runner@ingr-seed-project.iam.gserviceaccount.com"
-      - "serviceAccount:service-402500055106@container-engine-robot.iam.gserviceaccount.com"
-      - "serviceAccount:402500055106@cloudservices.gserviceaccount.com"

@@ -128,7 +128,7 @@ resource "google_storage_bucket" "log_archive" {
   name          = "${module.projects[local.log_cfg.project].project_id}-log-archive"
   project       = module.projects[local.log_cfg.project].project_id
   location      = local.log_cfg.gcs.location
-  force_destroy = false
+  force_destroy = true
   labels        = local.common_labels
   uniform_bucket_level_access = true
 
