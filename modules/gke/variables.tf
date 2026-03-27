@@ -13,6 +13,18 @@ variable "region" {
   type        = string
 }
 
+variable "regional" {
+  description = "Whether to create a regional cluster."
+  type        = bool
+  default     = true
+}
+
+variable "zones" {
+  description = "The zones to use for the cluster or node pool."
+  type        = list(string)
+  default     = []
+}
+
 variable "network_id" {
   description = "The VPC network ID."
   type        = string
@@ -24,9 +36,39 @@ variable "subnetwork_id" {
 }
 
 variable "node_count" {
-  description = "Number of nodes in the node pool."
+  description = "Initial number of nodes in the node pool."
   type        = number
   default     = 1
+}
+
+variable "min_node_count" {
+  description = "Minimum number of nodes for autoscaling."
+  type        = number
+  default     = 1
+}
+
+variable "max_node_count" {
+  description = "Maximum number of nodes for autoscaling."
+  type        = number
+  default     = 5
+}
+
+variable "enable_autoscaling" {
+  description = "Whether to enable node pool autoscaling."
+  type        = bool
+  default     = true
+}
+
+variable "enable_nap" {
+  description = "Whether to enable Node Auto-Provisioning (NAP)."
+  type        = bool
+  default     = true
+}
+
+variable "enable_private_endpoint" {
+  description = "Whether to disable the public endpoint of the cluster."
+  type        = bool
+  default     = true
 }
 
 variable "machine_type" {
@@ -54,4 +96,10 @@ variable "labels" {
   description = "A map of labels to apply to resources."
   type        = map(string)
   default     = {}
+}
+
+variable "release_channel" {
+  description = "GKE release channel (UNSPECIFIED, RAPID, REGULAR, STABLE)."
+  type        = string
+  default     = "REGULAR"
 }
