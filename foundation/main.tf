@@ -325,7 +325,7 @@ resource "google_project_iam_member" "project_iam_bindings" {
   role    = each.value.role
   member  = each.value.member
 
-  depends_on = [google_service_account.service_accounts]
+  depends_on = [google_service_account.service_accounts, module.vpcs]
 }
 
 # --- SHARED VPC PROJECT ATTACHMENTS ---

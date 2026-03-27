@@ -18,7 +18,7 @@ project_iam_bindings:
 
   - project: nonprod-host
     roles:
-      - roles/container.hostServiceAgent
+      - roles/container.hostServiceAgentUser
     members:
       - "serviceAccount:service-890886578244@container-engine-robot.iam.gserviceaccount.com"
 
