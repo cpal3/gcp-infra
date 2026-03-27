@@ -32,6 +32,7 @@ module "gke" {
   zones                  = try(each.value.gke.zones, [])
   network_id             = each.value.network_id
   subnetwork_id          = each.value.subnetwork_id
+  master_authorized_networks = try(each.value.gke.master_authorized_networks, [])
   node_count             = try(each.value.gke.node_count, 1)
   machine_type           = try(each.value.gke.machine_type, "e2-medium")
   master_ipv4_cidr_block = each.value.gke.master_ipv4_cidr_block

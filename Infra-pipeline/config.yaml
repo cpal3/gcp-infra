@@ -21,6 +21,9 @@ projects:
       deletion_protection: false
       regional: false
       zones: ["asia-south1-a"]
+      master_authorized_networks:
+        - cidr_block: "10.0.0.0/8"
+          display_name: "Internal (RFC 1918)"
       node_count: 1
       min_node_count: 1
       max_node_count: 5

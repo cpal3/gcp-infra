@@ -115,3 +115,12 @@ variable "release_channel" {
   type        = string
   default     = "REGULAR"
 }
+
+variable "master_authorized_networks" {
+  description = "List of master authorized networks."
+  type = list(object({
+    cidr_block   = string
+    display_name = string
+  }))
+  default = []
+}
