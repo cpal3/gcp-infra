@@ -165,9 +165,9 @@ vpcs:
             cidr: 10.1.136.0/21
           - name: gke-services
             cidr: 10.1.129.0/25
-      - name: test-subnet-asia-south1
-        cidr: 10.1.144.0/24
-        region: asia-south1
+      # - name: test-subnet-asia-south1
+      #   cidr: 10.1.144.0/24
+      #   region: asia-south1
       - name: nonprod-proxy-subnet-asia-south1
         cidr: 10.1.160.0/23
         region: asia-south1
