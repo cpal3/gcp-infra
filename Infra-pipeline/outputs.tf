@@ -1,7 +1,7 @@
 output "load_balancer_ips" {
   description = "Internal IP addresses of the deployed Load Balancers."
   value = {
-    for k, v in module.load_balancer : k => v.forward_rule_ip
+    for k, v in module.load_balancer : k => v.forwarding_rule_ip
   }
 }
 
