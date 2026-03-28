@@ -13,4 +13,5 @@ Prod,Secondary,gke-services-asia-south1,10.1.65.0/25,126,asia-south1,Allocated,2
 PreProd,Subnet,preprod-subnet-asia-south1,10.1.128.0/24,254,asia-south1,Allocated,2026-03-03,Primary subnet (Nodes)
 PreProd,Secondary,gke-pods-asia-south1,10.1.136.0/21,2046,asia-south1,Allocated,2026-03-03,GKE pod IPs
 PreProd,Secondary,gke-services-asia-south1,10.1.129.0/25,126,asia-south1,Allocated,2026-03-03,GKE service IPs
+PreProd,Subnet,nonprod-proxy-subnet-asia-south1,10.1.160.0/23,510,asia-south1,Allocated,2026-03-28,Proxy-only subnet for ILB
 

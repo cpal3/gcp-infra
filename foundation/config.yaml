@@ -66,7 +66,9 @@ projects:
       - compute.googleapis.com
       - container.googleapis.com
       - sqladmin.googleapis.com
-      - servicenetworking.googleapis.com 
+      - servicenetworking.googleapis.com
+      - run.googleapis.com
+      - compute.googleapis.com
 
 org_policies:
   - constraint: constraints/iam.disableServiceAccountKeyCreation
@@ -166,6 +168,11 @@ vpcs:
       - name: test-subnet-asia-south1
         cidr: 10.1.144.0/24
         region: asia-south1
+      - name: nonprod-proxy-subnet-asia-south1
+        cidr: 10.1.160.0/23
+        region: asia-south1
+        purpose: REGIONAL_MANAGED_PROXY
+        role: ACTIVE
     private_service_access_configs:
       - name: "google-managed-services-nonprod-vpc"
         address: "10.1.152.0"

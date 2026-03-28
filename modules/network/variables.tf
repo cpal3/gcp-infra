@@ -32,6 +32,8 @@ variable "subnets" {
     name                  = string
     cidr                  = string
     region                = string
+    purpose               = optional(string)
+    role                  = optional(string)
     private_google_access = optional(bool, true)
     secondary_ranges      = optional(list(object({ name = string, cidr = string })), [])
   }))

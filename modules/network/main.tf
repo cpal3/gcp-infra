@@ -14,6 +14,8 @@ resource "google_compute_subnetwork" "subnets" {
   network                  = google_compute_network.vpc.id
   project                  = var.project_id
   private_ip_google_access = lookup(each.value, "private_google_access", true)
+  purpose                  = each.value.purpose
+  role                     = each.value.role
 
   dynamic "secondary_ip_range" {
     for_each = lookup(each.value, "secondary_ranges", [])
