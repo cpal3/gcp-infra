@@ -55,6 +55,10 @@ projects:
       enabled: true
       lb_name: "ingr-internal-lb-nonprod"
 
+    testing_vm:
+      enabled: true
+      instance_name: "ingr-test-vm-nonprod"
+
   ## ----------------------------------------------------------------
   ## Template for another project (uncomment and fill in to onboard)
   ## ----------------------------------------------------------------

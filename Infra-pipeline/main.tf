@@ -97,3 +97,19 @@ module "load_balancer" {
   serverless_neg_id = try(module.cloud_run[each.key].serverless_neg_id, null)
   labels            = try(each.value.labels, {})
 }
+
+# =========================================================
+# Testing VM Modules (for verification)
+# =========================================================
+module "vm" {
+  source   = "../modules/vm"
+  for_each = { for k, v in local.projects : k => v if try(v.testing_vm.enabled, false) }
+
+  project_id    = each.value.project_id
+  region        = each.value.region
+  instance_name = each.value.testing_vm.instance_name
+  machine_type  = try(each.value.testing_vm.machine_type, "e2-micro")
+  network_id    = each.value.network_id
+  subnetwork_id = each.value.subnetwork_id
+  labels        = try(each.value.labels, {})
+}
