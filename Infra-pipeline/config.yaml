@@ -54,7 +54,6 @@ projects:
     load_balancer:
       enabled: true
       lb_name: "ingr-internal-lb-nonprod"
-      proxy_subnetwork_id: "projects/ingr-nonprod-host/regions/asia-south1/subnetworks/nonprod-proxy-subnet-asia-south1"
 
   ## ----------------------------------------------------------------
   ## Template for another project (uncomment and fill in to onboard)

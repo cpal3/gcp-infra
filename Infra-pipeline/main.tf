@@ -93,7 +93,7 @@ module "load_balancer" {
   region        = each.value.region
   lb_name           = each.value.load_balancer.lb_name
   network_id        = each.value.network_id
-  subnetwork_id     = try(each.value.load_balancer.proxy_subnetwork_id, each.value.subnetwork_id)
+  subnetwork_id     = each.value.subnetwork_id
   serverless_neg_id = try(module.cloud_run[each.key].serverless_neg_id, null)
   labels            = try(each.value.labels, {})
 }
