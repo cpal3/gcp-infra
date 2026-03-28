@@ -13,7 +13,7 @@ resource "google_compute_subnetwork" "subnets" {
   region                   = each.value.region
   network                  = google_compute_network.vpc.id
   project                  = var.project_id
-  private_ip_google_access = lookup(each.value, "private_google_access", true)
+  private_ip_google_access = each.value.purpose == "REGIONAL_MANAGED_PROXY" ? null : lookup(each.value, "private_google_access", true)
   purpose                  = each.value.purpose
   role                     = each.value.role
 
@@ -26,7 +26,7 @@ resource "google_compute_subnetwork" "subnets" {
   }
 
   dynamic "log_config" {
-    for_each = var.enable_flow_logs ? [1] : []
+    for_each = var.enable_flow_logs && each.value.purpose != "REGIONAL_MANAGED_PROXY" ? [1] : []
     content {
       aggregation_interval = "INTERVAL_5_SEC"
       flow_sampling        = 0.5
