@@ -172,6 +172,7 @@ vpcs:
         cidr: 10.1.160.0/23
         region: asia-south1
         purpose: REGIONAL_MANAGED_PROXY
+        private_ip_google_access: false
         role: ACTIVE
     private_service_access_configs:
       - name: "google-managed-services-nonprod-vpc"
