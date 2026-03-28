@@ -162,9 +162,9 @@ vpcs:
         region: asia-south1
         secondary_ranges:
           - name: gke-pods
-            cidr: 10.1.136.0/21
+            cidr: 10.20.0.0/16
           - name: gke-services
-            cidr: 10.1.129.0/25
+            cidr: 10.21.0.0/20
       # - name: test-subnet-asia-south1
       #   cidr: 10.1.144.0/24
       #   region: asia-south1

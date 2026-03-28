@@ -74,11 +74,12 @@ module "cloud_run" {
 
   project_id    = each.value.project_id
   region        = each.value.region
-  service_name  = each.value.cloud_run.service_name
-  image         = try(each.value.cloud_run.image, "us-docker.pkg.dev/cloudrun/container/hello")
-  network_id    = each.value.network_id
-  subnetwork_id = each.value.subnetwork_id
-  labels        = try(each.value.labels, {})
+  service_name    = each.value.cloud_run.service_name
+  image           = try(each.value.cloud_run.image, "us-docker.pkg.dev/cloudrun/container/hello")
+  service_account = try(each.value.cloud_run.service_account, null)
+  network_id      = each.value.network_id
+  subnetwork_id   = each.value.subnetwork_id
+  labels          = try(each.value.labels, {})
 }
 
 # =========================================================
@@ -90,8 +91,9 @@ module "load_balancer" {
 
   project_id    = each.value.project_id
   region        = each.value.region
-  lb_name       = each.value.load_balancer.lb_name
-  network_id    = each.value.network_id
-  subnetwork_id = each.value.subnetwork_id
-  labels        = try(each.value.labels, {})
+  lb_name           = each.value.load_balancer.lb_name
+  network_id        = each.value.network_id
+  subnetwork_id     = try(each.value.load_balancer.proxy_subnetwork_id, each.value.subnetwork_id)
+  serverless_neg_id = try(module.cloud_run[each.key].serverless_neg_id, null)
+  labels            = try(each.value.labels, {})
 }

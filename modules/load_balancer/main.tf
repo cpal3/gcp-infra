@@ -5,8 +5,12 @@ resource "google_compute_region_backend_service" "default" {
   load_balancing_scheme = "INTERNAL_MANAGED"
   protocol              = "HTTP"
 
-  # We assume a backend block is passed dynamically or configured post-creation
-  # In a robust module, we would have dynamic blocks for backends
+  dynamic "backend" {
+    for_each = var.serverless_neg_id != null ? [1] : []
+    content {
+      group = var.serverless_neg_id
+    }
+  }
 }
 
 resource "google_compute_region_url_map" "default" {

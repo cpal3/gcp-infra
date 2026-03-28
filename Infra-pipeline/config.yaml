@@ -49,10 +49,12 @@ projects:
       enabled: true
       service_name: "ingr-app-service-nonprod"
       image: "us-docker.pkg.dev/cloudrun/container/hello"  # Default hello world
+      service_account: "app-sa@ingr-app-backend-nonprod.iam.gserviceaccount.com"
 
     load_balancer:
       enabled: true
       lb_name: "ingr-internal-lb-nonprod"
+      proxy_subnetwork_id: "projects/ingr-nonprod-host/regions/asia-south1/subnetworks/nonprod-proxy-subnet-asia-south1"
 
   ## ----------------------------------------------------------------
   ## Template for another project (uncomment and fill in to onboard)

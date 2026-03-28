@@ -28,3 +28,9 @@ variable "labels" {
   type        = map(string)
   default     = {}
 }
+
+variable "serverless_neg_id" {
+  description = "The ID of the Serverless NEG for the backend."
+  type        = string
+  default     = null
+}
