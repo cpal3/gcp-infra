@@ -34,3 +34,9 @@ variable "labels" {
   type        = map(string)
   default     = {}
 }
+
+variable "service_account" {
+  description = "The service account to run the service as."
+  type        = string
+  default     = null
+}
