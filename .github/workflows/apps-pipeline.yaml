@@ -15,6 +15,7 @@ permissions:
 env:
   PROJECT_ID: "ingr-app-backend-nonprod"
   REGION: "asia-south1"
+  GKE_ZONE: "asia-south1-a"
   CLUSTER_NAME: "ingr-gke-private-nonprod"
   AR_REPO_NAME: "ingr-app-repo"
   SERVICE_NAME: "my-app"
@@ -51,7 +52,7 @@ jobs:
         uses: google-github-actions/get-gke-credentials@v2
         with:
           cluster_name: ${{ env.CLUSTER_NAME }}
-          location: ${{ env.REGION }}
+          location: ${{ env.GKE_ZONE }}
           project_id: ${{ env.PROJECT_ID }}
           use_connect_gateway: true # IMPORTANT: Use Connect Gateway for private cluster access
 
