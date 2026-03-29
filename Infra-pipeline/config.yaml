@@ -37,6 +37,12 @@ projects:
       ## Must match the secondary_range names in networking/config.yaml
       ip_range_pods: "gke-pods"
       ip_range_services: "gke-services"
+      enable_fleet_registration: true
+
+    artifact_registry:
+      enabled: true
+      repo_id: "ingr-app-repo"
+      format: "DOCKER"
 
     cloud_sql:
       enabled: false        # Enable when DB is needed for this project

@@ -68,7 +68,10 @@ projects:
       - sqladmin.googleapis.com
       - servicenetworking.googleapis.com
       - run.googleapis.com
-      - compute.googleapis.com
+      - artifactregistry.googleapis.com
+      - gkehub.googleapis.com
+      - connectgateway.googleapis.com
+      - anthos.googleapis.com
 
 org_policies:
   - constraint: constraints/iam.disableServiceAccountKeyCreation

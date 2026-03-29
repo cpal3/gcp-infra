@@ -124,3 +124,10 @@ variable "master_authorized_networks" {
   }))
   default = []
 }
+
+variable "enable_fleet_registration" {
+  description = "Whether to register the cluster in the GKE Fleet (Hub) for Connect Gateway."
+  type        = bool
+  default     = false
+}
+

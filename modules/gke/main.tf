@@ -125,3 +125,25 @@ resource "google_container_node_pool" "primary_nodes" {
     ]
   }
 }
+
+# =========================================================
+# GKE Fleet (Hub) Registration for Connect Gateway
+# =========================================================
+resource "google_gke_hub_membership" "membership" {
+  count         = var.enable_fleet_registration ? 1 : 0
+  project       = var.project_id
+  membership_id = var.cluster_name
+  endpoint {
+    gke_cluster {
+      resource_link = "//container.googleapis.com/${google_container_cluster.primary.id}"
+    }
+  }
+}
+
+output "cluster_name" {
+  value = google_container_cluster.primary.name
+}
+
+output "membership_id" {
+  value = var.enable_fleet_registration ? google_gke_hub_membership.membership[0].membership_id : null
+}

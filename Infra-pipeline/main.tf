@@ -45,7 +45,22 @@ module "gke" {
   release_channel        = try(each.value.gke.release_channel, "REGULAR")
   ip_range_pods          = each.value.gke.ip_range_pods
   ip_range_services      = each.value.gke.ip_range_services
+  enable_fleet_registration = try(each.value.gke.enable_fleet_registration, false)
   labels                 = try(each.value.labels, {})
+}
+
+# =========================================================
+# Artifact Registry Modules
+# =========================================================
+module "artifact_registry" {
+  source   = "../modules/artifact_registry"
+  for_each = { for k, v in local.projects : k => v if try(v.artifact_registry.enabled, false) }
+
+  project_id = each.value.project_id
+  region     = each.value.region
+  repo_id    = each.value.artifact_registry.repo_id
+  format     = try(each.value.artifact_registry.format, "DOCKER")
+  labels     = try(each.value.labels, {})
 }
 
 # =========================================================

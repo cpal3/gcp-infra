@@ -1,0 +1,68 @@
+name: Apps Pipeline (Build & Deploy)
+
+on:
+  workflow_dispatch: # Manual trigger for testing
+  push:
+    branches:
+      - main
+    paths:
+      - 'app/**' # Trigger when app code changes
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  PROJECT_ID: "ingr-app-backend-nonprod"
+  REGION: "asia-south1"
+  CLUSTER_NAME: "ingr-gke-private-nonprod"
+  AR_REPO_NAME: "ingr-app-repo"
+  SERVICE_NAME: "my-app"
+  IMAGE_NAME: "my-app-image"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Authenticate to GCP (WIF)
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: 'projects/671995239099/locations/global/workloadIdentityPools/github-actions-pool/providers/github-provider'
+          service_account: 'terraform-runner@ingr-seed-project.iam.gserviceaccount.com'
+
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Configure Docker for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+
+      - name: Build and Push Docker Image
+        run: |
+          IMAGE_TAG="${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}"
+          docker build -t $IMAGE_TAG ./app
+          docker push $IMAGE_TAG
+          echo "IMAGE_TAG=$IMAGE_TAG" >> $GITHUB_ENV
+
+      - name: Get GKE Credentials (Connect Gateway)
+        uses: google-github-actions/get-gke-credentials@v2
+        with:
+          cluster_name: ${{ env.CLUSTER_NAME }}
+          location: ${{ env.REGION }}
+          project_id: ${{ env.PROJECT_ID }}
+          use_connect_gateway: true # IMPORTANT: Use Connect Gateway for private cluster access
+
+      - name: Deploy to GKE
+        run: |
+          # Use kubectl to update the deployment image
+          # If deployment doesn't exist, this will fail. For demo purposes, we'll try to apply a manifest.
+          if [ -f "k8s/deployment.yaml" ]; then
+            envsubst < k8s/deployment.yaml | kubectl apply -f -
+          else
+            echo "No k8s/deployment.yaml found. Skipping kubectl apply."
+            # Alternatively, if deployment exists:
+            # kubectl set image deployment/${{ env.SERVICE_NAME }} container=${{ env.IMAGE_TAG }}
+          fi

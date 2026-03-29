@@ -16,6 +16,15 @@ project_iam_bindings:
     members:
       - "serviceAccount:app-sa@ingr-app-backend-nonprod.iam.gserviceaccount.com"
 
+  - project: app-backend-nonprod
+    roles:
+      - roles/artifactregistry.writer
+      - roles/gkehub.gatewayAdmin
+      - roles/container.developer
+      - roles/gkehub.viewer
+    members:
+      - "serviceAccount:terraform-runner@ingr-seed-project.iam.gserviceaccount.com"
+
   - project: nonprod-host
     roles:
       - roles/container.hostServiceAgentUser
