@@ -57,12 +57,8 @@ jobs:
 
       - name: Deploy to GKE
         run: |
-          # Use kubectl to update the deployment image
-          # If deployment doesn't exist, this will fail. For demo purposes, we'll try to apply a manifest.
-          if [ -f "k8s/deployment.yaml" ]; then
-            envsubst < k8s/deployment.yaml | kubectl apply -f -
-          else
-            echo "No k8s/deployment.yaml found. Skipping kubectl apply."
-            # Alternatively, if deployment exists:
-            # kubectl set image deployment/${{ env.SERVICE_NAME }} container=${{ env.IMAGE_TAG }}
-          fi
+          mkdir -p .k8s-manifests
+          for f in k8s/*.yaml; do
+            envsubst < $f > .k8s-manifests/$(basename $f)
+          done
+          kubectl apply -f .k8s-manifests/
