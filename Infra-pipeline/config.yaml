@@ -16,7 +16,7 @@ projects:
     subnetwork_id: "projects/ingr-nonprod-host/regions/asia-south1/subnetworks/nonprod-subnet-asia-south1"
 
     gke:
-      enabled: false
+      enabled: true
       cluster_name: "ingr-gke-private-nonprod"
       deletion_protection: false
       regional: false
@@ -46,13 +46,13 @@ projects:
       allocated_ip_range: "google-managed-services-nonprod-vpc"  # PSA range name
 
     cloud_run:
-      enabled: true
+      enabled: false
       service_name: "ingr-app-service-nonprod"
       image: "us-docker.pkg.dev/cloudrun/container/hello"  # Default hello world
       service_account: "app-sa@ingr-app-backend-nonprod.iam.gserviceaccount.com"
 
     load_balancer:
-      enabled: true
+      enabled: false
       lb_name: "ingr-internal-lb-nonprod"
 
     testing_vm:
