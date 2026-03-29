@@ -128,3 +128,15 @@ module "vm" {
   subnetwork_id = each.value.subnetwork_id
   labels        = try(each.value.labels, {})
 }
+
+# =========================================================
+# GKE Access to Artifact Registry
+# =========================================================
+resource "google_artifact_registry_repository_iam_member" "gke_pull_permission" {
+  for_each   = module.artifact_registry
+  project    = local.projects[each.key].project_id
+  location   = local.projects[each.key].region
+  repository = local.projects[each.key].artifact_registry.repo_id
+  role       = "roles/artifactregistry.reader"
+  member     = "serviceAccount:890886578244-compute@developer.gserviceaccount.com"
+}
