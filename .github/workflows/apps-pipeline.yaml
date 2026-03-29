@@ -6,7 +6,8 @@ on:
     branches:
       - main
     paths:
-      - 'app/**' # Trigger when app code changes
+      - 'app/**'
+      - '.github/workflows/apps-pipeline.yaml'
 
 permissions:
   contents: read
